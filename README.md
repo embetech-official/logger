@@ -1,5 +1,6 @@
 # LOGGER - Lightweight, portable formatted logging component
 
+[![C++ CI](https://github.com/embetech-official/logger/actions/workflows/build_cmake.yml/badge.svg)](https://github.com/embetech-official/logger/actions/workflows/build_cmake.yml)
 # Overview
 Logger is a lightweight and portable logging component written in C99, with some preprocessor magic (but C99-compliant (... yet magical :)) ).
 
