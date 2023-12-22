@@ -1,4 +1,4 @@
-name: C++ CI
+name: C++ Unit Tests
 
 on:
   push:
@@ -8,15 +8,21 @@ on:
 
 jobs:
   build_and_test:
-    runs-on: ubuntu-latest
+
+
+    runs-on: [self-hosted, linux, x64]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Install build environment
-        run: sudo apt install -y build-essential cmake  ninja-build
+      - uses: lukka/get-cmake@latest
+        with:
+          useLocalCache: true
+      
+      - uses: actions/checkout@v4
+
       - name: Configure
         run: cmake -B build -G Ninja
+
       - name: Build
         run: cmake --build build -t all
+
       - name: Test
         run: ctest --test-dir build
