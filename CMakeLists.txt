@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.20)
 
 project(
   logger
@@ -38,8 +38,9 @@ list(REMOVE_DUPLICATES EXTENDED_MODULE_PATH)
 set(CMAKE_MODULE_PATH ${EXTENDED_MODULE_PATH} CACHE INTERNAL "" FORCE)
 
 
-add_subdirectory(src)
+include(requirements.cmake)
 
+add_subdirectory(src)
 
 if (PROJECT_IS_TOP_LEVEL OR LOGGER_BUILD_TESTS)
   enable_testing()
