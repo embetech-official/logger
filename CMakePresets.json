@@ -1,0 +1,56 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 20,
+        "patch": 0
+    },
+    "include": [],
+    "configurePresets": [
+        {
+            "name": "default",
+            "displayName": "Default Config",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CONFIG_RING_BUFFER_16_ENABLE": "ON",
+                "CONFIG_RING_BUFFER_BUILD_TESTS": "OFF"
+            }
+        },
+        {
+            "name": "devel",
+            "displayName": "Unit testing",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CONFIG_RING_BUFFER_16_ENABLE": "ON",
+                "CONFIG_RING_BUFFER_BUILD_TESTS": "ON"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "default",
+            "configurePreset": "default"
+        },
+        {
+            "name": "devel",
+            "configurePreset": "devel"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "default",
+            "configurePreset": "devel",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        }
+    ]
+}

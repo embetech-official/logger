@@ -31,7 +31,7 @@ Logger is compatibile with almost every possible CMake include option:
 
 example configuration using find_package:
 ``` cmake
-set(LOGGER_CUSTOM_AFFIXES ON) # Available options are described later
+set(CONFIG_LOGGER_CUSTOM_AFFIXES ON) # Available options are described later
 find_package(logger REQUIRED)
 target_link_libraries(example PUBLIC embetech::logger)
 ```
@@ -94,7 +94,7 @@ Global configuration shall be stored in logger_config.h file The example below p
 
 ## Features configuration
 In order to stay flexible and minimalistic logger uses compile-time configuration options that will affect global behaviour. The list below reflects options available in CMakeLists.txt file:
-### LOGGER_TIMESTAMPS
+### CONFIG_LOGGER_TIMESTAMPS
 If turned on, the Logger header format will contain timestamp, acquired from the user defined callback via LOGGER_SetTimeSource function:
 ```C
 LOGGER_SetTimeSource([](){return std::uint32_t(8000085);}); // Short C++ lambda to save the world
@@ -105,13 +105,13 @@ will be printed as (assuming DEFAULT channel):
 8000085 DEFAULT (I): test message
 ```
 
-### LOGGER_HUMAN_READABLE_TIMESTAMP
-This option is available only when LOGGER_TIMESTAMPS is ON.
+### CONFIG_LOGGER_HUMAN_READABLE_TIMESTAMP
+This option is available only when CONFIG_LOGGER_TIMESTAMPS is ON.
 Changes the format of timestamp to hh:mm::ss.ms:
 ```
 02:13:20.085 DEFAULT (I): test message
 ```
-### LOGGER_CUSTOM_AFFIXES
+### CONFIG_LOGGER_CUSTOM_AFFIXES
 Allows setting custom prefix/suffix for every Logger message, using LOGGER_SetPrefix/LOGGER_SetSuffix function.
 Both will be printed as binary data, so no '\0' termination is required.
 This feature might be useful when working with custom terminal protocols.
@@ -125,7 +125,7 @@ will produce
 ```
 pre- DEFAULT (N): test message -post
 ```
-### LOGGER_RUNTIME_VERBOSITY
+### CONFIG_LOGGER_RUNTIME_VERBOSITY
 Enables reducing verbosity of printed messages AT RUNTIME using  LOGGER_SetRuntimeLevel function. Of course, compile time level is still stronger so the resulting set of messages will be no greater than both:
 ```C
     LOGGER_NOTICE("test message1");
@@ -142,7 +142,7 @@ DEFAULT (N): test message3
 ```
 the second message will not be printed, however its code is still available to be enabled (assuming that DEFAULT_LOG_CHANNEL_LEVEL is at least at NOTICE)
 
-### LOGGER_HEADER_WITH_LOCATION
+### CONFIG_LOGGER_HEADER_WITH_LOCATION
 Expands the header with code location [file:line]:
 ```
 DEFAULT (N) [x:\long_path\file.cpp:66]: test message
@@ -156,7 +156,7 @@ logger_normalize_printable_filenames()
 this would change the above message to
 ```
 DEFAULT (N) [file.cpp:66]: test message
-### LOGGER_THREAD_SAFETY_HOOKS
+### CONFIG_LOGGER_THREAD_SAFETY_HOOKS
 By design, logger is as thread-safe as your output callback (so probably no).
 When this option is enabled. Logger will use user-provided lock/unlock functions to ensure thread safety.
 To do so, you should register lock/unlock callbacks:
@@ -182,7 +182,7 @@ The API of callbacks is fairly universal... You might be able to simply plug you
 
 LOGGER will always try to lock before printing message. In scoped printing case, The lock will be acquired by LOGGER_START, and released by LOGGER_END/LOGGER_ENDL.
 
-### LOGGER_FLUSH_HOOKS
+### CONFIG_LOGGER_FLUSH_HOOKS
 Enables user to bind function, to flush output. The function may either be called explicitly, using LOGGER_Flush(), or automatically on the end of each message (So every LOGGER_INFO/etc. or after each LOGGER_END/LOGGER_ENDL):
 ```C
 LOGGER_DisableHeader();
@@ -205,7 +205,7 @@ marco!
 polo!!
 ```
 
-### LOGGER_VERBOSE_ERRORS
+### CONFIG_LOGGER_VERBOSE_ERRORS
 When user messed up, it may be difficult to dig through all preprocessor magic. When this option is enabled, and your compiler is eiter clang or GCC-like, each compile-time error will be appended with message, which logger channel was the culprit
 
 

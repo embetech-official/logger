@@ -7,7 +7,7 @@ list(TRANSFORM LOGGER_SOURCES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 
 add_library(logger_test_proxy7 ${LOGGER_SOURCES})
 target_include_directories(logger_test_proxy7 PUBLIC ${LOGGER_INCLUDES})
-target_compile_definitions(logger_test_proxy7 PUBLIC LOGGER_FLUSH_HOOKS=1)
+target_compile_definitions(logger_test_proxy7 PUBLIC CONFIG_LOGGER_FLUSH_HOOKS=1)
 
 add_executable(logger_ut07 ut07_flush_hooks.cpp)
 target_link_libraries(logger_ut07 PRIVATE logger_test_proxy7 logger_test_common)

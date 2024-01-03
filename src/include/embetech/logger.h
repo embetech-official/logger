@@ -120,7 +120,7 @@ typedef void (*LOGGER_UnlockFunction)(void* context); ///< Log unlock function t
  * @param[in] fContext output function's context
  * @note since LOGGER will not initialize/deinitialze the locking mechanism, it is user responsibility to manage its lifetime
  * @note lock and unlock function pointer has to be both either null or non-null
- * @note if LOGGER_THREAD_SAFETY_HOOKS is set to 0, the function can be called, but this setting has no effect
+ * @note if CONFIG_LOGGER_THREAD_SAFETY_HOOKS is set to 0, the function can be called, but this setting has no effect
  * @retval true when locking mechains has been changed, false if provided arguments are invalid or lock-timeout ocurred
  */
 bool LOGGER_SetLockingMechanism(LOGGER_LockFunction lock, LOGGER_UnlockFunction unlock, void* fContext);
@@ -144,7 +144,7 @@ typedef void (*LOGGER_FlushFunction)(void); ///< Flush function prototype
  * @param[in] hook flush hook
  * @param[in] flushOnNewLine sets runtime behaviour, whether the hook function should be called automatically on each new line character.
  * @note The function accepts nullptr as a way to unbind current hook
- * @note if LOGGER_HEADER_WITH_LOCATION is set to 0, the function can be called, but this setting has no effect
+ * @note if CONFIG_LOGGER_HEADER_WITH_LOCATION is set to 0, the function can be called, but this setting has no effect
  */
 void LOGGER_SetFlushHook(LOGGER_FlushFunction hook, bool flushOnNewLine);
 
@@ -186,7 +186,7 @@ typedef int LOGGER_level; ///< Default level type
 
 /**
  * @brief Returns current runtime verbosity level
- * @note if LOGGER_RUNTIME_VERBOSITY is set to 0, the function can be called, however the result of the function is not meaningful (runtime level setting is not available).
+ * @note if CONFIG_LOGGER_RUNTIME_VERBOSITY is set to 0, the function can be called, however the result of the function is not meaningful (runtime level setting is not available).
  */
 static inline LOGGER_level LOGGER_GetRuntimeLevel(void);
 
@@ -195,7 +195,7 @@ static inline LOGGER_level LOGGER_GetRuntimeLevel(void);
  * @brief Sets runtime verbosity level for all channels
  * @param[in] level new runtime verbosity
  * @note This function will not print log messages that were not included at compile time
- * @note if LOGGER_RUNTIME_VERBOSITY is set to 0, the function can be called, but this setting has no effect (runtime level setting is not available)
+ * @note if CONFIG_LOGGER_RUNTIME_VERBOSITY is set to 0, the function can be called, but this setting has no effect (runtime level setting is not available)
  */
 void LOGGER_SetRuntimeLevel(LOGGER_level level);
 
@@ -207,7 +207,7 @@ void LOGGER_SetRuntimeLevel(LOGGER_level level);
  * The data MAY NOT be a valid. null-terminated string, and LOGGER guarantees that exactly length characters will be printed out
  * @param[in] data memory location with at least length size that stores the prefix. LOGGER stores only the pointer and size information, so user MUST guarantee the lifetime of the object
  * @param[in] length length of prefix
- * @note if LOGGER_CUSTOM_AFFIXES is set to 0, the function can be called, but this setting has no effect
+ * @note if CONFIG_LOGGER_CUSTOM_AFFIXES is set to 0, the function can be called, but this setting has no effect
  */
 void LOGGER_SetPrefix(char const* data, size_t length);
 
@@ -218,7 +218,7 @@ void LOGGER_SetPrefix(char const* data, size_t length);
  * The data MAY NOT be a valid. null-terminated string, and LOGGER guarantees that exactly length characters will be printed out
  * @param[in] data memory location with at least length size that stores the suffix. LOGGER stores only the pointer and size information, so user MUST guarantee the lifetime of the object
  * @param[in] length length of suffix
- * @note if LOGGER_CUSTOM_AFFIXES is set to 0, the function can be called, but this setting has no effect
+ * @note if CONFIG_LOGGER_CUSTOM_AFFIXES is set to 0, the function can be called, but this setting has no effect
  */
 void LOGGER_SetSuffix(char const* data, size_t length);
 
@@ -454,7 +454,7 @@ void LOGGER_SetSuffix(char const* data, size_t length);
 #    if LOGGER_NOT(LOGGER_IF_NOT_EMPTY(LOGGER_CHANNEL_LEVEL)) // First ensure that LOGGER_CHANNEL_LEVEL has value. It won't be true if the user messed up and defined ***_LOG_CHANNEL_LEVEL empty
 #        error "<see below>_LOG_CHANNEL_LEVEL has no explicit value"
 
-#        if 1 == LOGGER_VERBOSE_ERRORS // Add verbose message
+#        if 1 == CONFIG_LOGGER_VERBOSE_ERRORS // Add verbose message
 #            pragma message "LOGGER_CHANNEL evaluates to " LOGGER_STR(LOGGER_CHANNEL)
 #        endif
 #    endif
@@ -463,7 +463,7 @@ void LOGGER_SetSuffix(char const* data, size_t length);
                                                                     // (because LOGGER_CHANNEL_LEVEL has no explicit value)
 #        error <see below>_LOG_CHANNEL_LEVEL not defined for this translation unit
 
-#        if 1 == LOGGER_VERBOSE_ERRORS // Add verbose message
+#        if 1 == CONFIG_LOGGER_VERBOSE_ERRORS // Add verbose message
 #            pragma message "LOGGER_CHANNEL evaluates to " LOGGER_STR(LOGGER_CHANNEL)
 #        endif
 #    endif
@@ -474,7 +474,7 @@ void LOGGER_SetSuffix(char const* data, size_t length);
 #if ((LOGGER_CHANNEL_LEVEL < LOGGER_LEVEL_DISABLED) || (LOGGER_CHANNEL_LEVEL > LOGGER_LEVEL_TRACE))
 #    error <see below>_LOG_CHANNEL_LEVEL is out of bounds
 
-#    if 1 == LOGGER_VERBOSE_ERRORS // Add verbose message
+#    if 1 == CONFIG_LOGGER_VERBOSE_ERRORS // Add verbose message
 #        pragma message "LOGGER_CHANNEL evaluates to " LOGGER_STR(LOGGER_CHANNEL)
 #    endif
 #endif
@@ -491,7 +491,7 @@ void LOGGER_SetSuffix(char const* data, size_t length);
  * @brief Returns boolean value whether the given verbosity level may be printed with current runtime and compile-time verbosity setting
  * @param[in] level level to check
  */
-#if 1 == LOGGER_RUNTIME_VERBOSITY
+#if 1 == CONFIG_LOGGER_RUNTIME_VERBOSITY
 #    define LOGGER_IS_VERBOSITY_ENABLED(level) ((level > LOGGER_LEVEL_DISABLED) && (level <= LOGGER_CHANNEL_LEVEL) && (level <= LOGGER_GetRuntimeLevel()))
 
 
@@ -521,7 +521,7 @@ static inline LOGGER_level LOGGER_GetRuntimeLevel(void) {
 /************************************************************************/
 /************* HEADER_WITH_LOCATION - Configurable features *************/
 /************************************************************************/
-#if 1 == LOGGER_HEADER_WITH_LOCATION
+#if 1 == CONFIG_LOGGER_HEADER_WITH_LOCATION
 
 typedef struct {
     LOGGER_level level;
@@ -556,7 +556,7 @@ typedef struct {
 /***********************************************************************/
 /************* THREAD_SAFETY_HOOKS - Configurable features *************/
 /***********************************************************************/
-#if 1 == LOGGER_THREAD_SAFETY_HOOKS
+#if 1 == CONFIG_LOGGER_THREAD_SAFETY_HOOKS
 /**
  * @brief Attempts to achieve exclusive access to log output
  * @return true if access was achieved, false otherwise. If user did not set locking mechanisms, will allways return true
@@ -587,7 +587,7 @@ static inline void LOGGER_Unlock(void) {
 /***************************************************************/
 /************* FLUSH_HOOKS - Configurable features *************/
 /***************************************************************/
-#if 1 == LOGGER_FLUSH_HOOKS
+#if 1 == CONFIG_LOGGER_FLUSH_HOOKS
 /**
  * @brief Calls user flush function (if set)
  *
