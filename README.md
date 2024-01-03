@@ -1,7 +1,7 @@
 # LOGGER - Lightweight, portable formatted logging component
 
 [![C++ Unit Tests](https://github.com/embetech-official/logger/actions/workflows/cpp_unit_tests.yml/badge.svg)](https://github.com/embetech-official/logger/actions/workflows/cpp_unit_tests.yml)
-![GitHub release (with filter)](https://img.shields.io/github/v/release/embetech-official/logger)
+
 # Overview
 Logger is a lightweight and portable logging component written in C99, with some preprocessor magic (but C99-compliant (... yet magical :)) ).
 
