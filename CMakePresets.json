@@ -16,6 +16,17 @@
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CONFIG_LOGGER_BUILD_TESTS": "ON"
             }
+        },
+        {
+            "name": "release",
+            "displayName": "Release",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "installDir": "${sourceDir}/release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CONFIG_LOGGER_BUILD_TESTS": "OFF"
+            }
         }
     ],
     "buildPresets": [
