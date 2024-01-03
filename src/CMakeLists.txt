@@ -19,8 +19,8 @@ add_library(logger STATIC logger.c third_party/printf.c)
 
 target_include_directories(
   logger
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>
-  PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/third_party>
+  PUBLIC include
+  PRIVATE third_party
 )
 
 target_compile_definitions(
@@ -41,5 +41,3 @@ target_compile_definitions(
 target_compile_features(logger PUBLIC c_std_99)
 
 add_library(embetech::logger ALIAS logger)
-
-include(${PROJECT_SOURCE_DIR}/cmake/component_install.cmake)

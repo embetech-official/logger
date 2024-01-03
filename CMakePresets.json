@@ -8,39 +8,26 @@
     "include": [],
     "configurePresets": [
         {
-            "name": "default",
-            "displayName": "Default Config",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/${presetName}",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CONFIG_LOGGER_BUILD_TESTS": "OFF"
-            }
-        },
-        {
-            "name": "devel",
+            "name": "testing",
             "displayName": "Unit testing",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
                 "CONFIG_LOGGER_BUILD_TESTS": "ON"
             }
         }
     ],
     "buildPresets": [
         {
-            "name": "default",
-            "configurePreset": "default"
-        },
-        {
-            "name": "devel",
-            "configurePreset": "devel"
+            "name": "testing",
+            "configurePreset": "testing"
         }
     ],
     "testPresets": [
         {
-            "name": "default",
-            "configurePreset": "devel",
+            "name": "testing",
+            "configurePreset": "testing",
             "output": {
                 "outputOnFailure": true
             },

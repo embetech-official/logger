@@ -4,11 +4,6 @@ include(GoogleTest)
 
 FetchContent_MakeAvailable(googletest)
 
-# Exclude googletest from all to make use of install target
-if (IS_DIRECTORY "${googletest_SOURCE_DIR}")
-  set_property(DIRECTORY ${googletest_SOURCE_DIR} PROPERTY EXCLUDE_FROM_ALL YES)
-endif ()
-
 add_library(logger_test_common INTERFACE)
 target_compile_features(logger_test_common INTERFACE cxx_std_20)
 target_compile_options(logger_test_common INTERFACE -Wall -Wextra -Wconversion -pedantic)
