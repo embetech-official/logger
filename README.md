@@ -280,9 +280,3 @@ DEFAULT    (N): bananas
 
 ## Header runtime control
 User may disable printing header, simply using LOGGER_EnableHeader/LOGGER_DisableHeader functions
-
-# Authors
-Jan Macheta
-
-# License
-MIT
