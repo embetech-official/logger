@@ -14,8 +14,7 @@
             "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CONFIG_RING_BUFFER_16_ENABLE": "ON",
-                "CONFIG_RING_BUFFER_BUILD_TESTS": "OFF"
+                "CONFIG_LOGGER_BUILD_TESTS": "OFF"
             }
         },
         {
@@ -24,9 +23,7 @@
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CONFIG_RING_BUFFER_16_ENABLE": "ON",
-                "CONFIG_RING_BUFFER_BUILD_TESTS": "ON"
+                "CONFIG_LOGGER_BUILD_TESTS": "ON"
             }
         }
     ],
