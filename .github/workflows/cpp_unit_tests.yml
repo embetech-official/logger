@@ -8,8 +8,6 @@ on:
 
 jobs:
   build_and_test:
-
-
     runs-on: [self-hosted, linux, x64]
     steps:
       - uses: lukka/get-cmake@latest
@@ -18,11 +16,22 @@ jobs:
       
       - uses: actions/checkout@v4
 
-      - name: Configure
+      - name: Configure for tests
         run: cmake --preset testing
 
-      - name: Build
+      - name: Build tests
         run: cmake --build --preset testing
 
       - name: Test
         run: ctest --preset testing
+
+      - name: Configure for release
+        run: cmake --preset release
+
+      - name: Build release
+        run: cmake --build --preset release
+
+      - name: Install
+        run: cmake --install build/release
+        
+
