@@ -19,5 +19,8 @@ target_compile_definitions(logger_test_proxy3_2 PUBLIC CONFIG_LOGGER_CUSTOM_AFFI
 add_executable(logger_ut03_2 ut03_2_affixes_timestamp.cpp)
 target_link_libraries(logger_ut03_2 PRIVATE logger_test_proxy3_2 logger_test_common)
 
+add_dependencies(logger_ut logger_ut03_1)
+add_dependencies(logger_ut logger_ut03_2)
+
 gtest_discover_tests(logger_ut03_1)
 gtest_discover_tests(logger_ut03_2)

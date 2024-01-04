@@ -12,4 +12,6 @@ target_compile_definitions(logger_test_proxy6 PUBLIC CONFIG_LOGGER_THREAD_SAFETY
 add_executable(logger_ut06 ut06_thread_safety.cpp)
 target_link_libraries(logger_ut06 PRIVATE logger_test_proxy6 logger_test_common)
 
+add_dependencies(logger_ut logger_ut06)
+
 gtest_discover_tests(logger_ut06)

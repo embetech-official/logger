@@ -21,5 +21,8 @@ target_compile_definitions(
 add_executable(logger_ut02_2 ut02_2_human_readable_timestamp.cpp)
 target_link_libraries(logger_ut02_2 PRIVATE logger_test_proxy2_2 logger_test_common)
 
+add_dependencies(logger_ut logger_ut02_1)
+add_dependencies(logger_ut logger_ut02_2)
+
 gtest_discover_tests(logger_ut02_1)
 gtest_discover_tests(logger_ut02_2)

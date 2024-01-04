@@ -42,4 +42,6 @@ target_compile_features(logger PUBLIC c_std_99)
 
 add_library(embetech::logger ALIAS logger)
 
-include(logger_install)
+if (CONFIG_LOGGER_ENABLE_INSTALL_TARGET)
+  include(logger_install)
+endif ()

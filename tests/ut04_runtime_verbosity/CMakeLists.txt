@@ -12,4 +12,6 @@ target_compile_definitions(logger_test_proxy4 PUBLIC CONFIG_LOGGER_RUNTIME_VERBO
 add_executable(logger_ut04 ut04_runtime_verbosity.cpp)
 target_link_libraries(logger_ut04 PRIVATE logger_test_proxy4 logger_test_common)
 
+add_dependencies(logger_ut logger_ut04)
+
 gtest_discover_tests(logger_ut04)

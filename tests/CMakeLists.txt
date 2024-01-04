@@ -10,6 +10,8 @@ target_compile_options(logger_test_common INTERFACE -Wall -Wextra -Wconversion -
 target_link_libraries(logger_test_common INTERFACE GTest::gtest_main)
 target_link_options(logger_test_common INTERFACE -pthread)
 
+add_custom_target(logger_ut)
+
 add_subdirectory(ut01_mvp)
 add_subdirectory(ut02_timestamps)
 add_subdirectory(ut03_affixes)

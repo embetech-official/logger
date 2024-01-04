@@ -8,35 +8,30 @@
     "include": [],
     "configurePresets": [
         {
-            "name": "testing",
-            "displayName": "Unit testing",
+            "name": "default",
+            "displayName": "Default",
+            "description": "Default build configuration",
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/${presetName}",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CONFIG_LOGGER_BUILD_TESTS": "ON"
-            }
-        },
-        {
-            "name": "release",
-            "displayName": "Release",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/${presetName}",
+            "binaryDir": "${sourceDir}/build",
             "installDir": "${sourceDir}/release",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "CONFIG_LOGGER_BUILD_TESTS": "OFF"
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CONFIG_LOGGER_BUILD_TESTS": "ON",
+                "CONFIG_LOGGER_ENABLE_INSTALL_TARGET": "ON"
             }
         }
     ],
     "buildPresets": [
         {
             "name": "testing",
-            "configurePreset": "testing"
+            "configurePreset": "default",
+            "targets": [
+                "logger_ut"
+            ]
         },
         {
             "name": "release",
-            "configurePreset": "release",
+            "configurePreset": "default",
             "targets": [
                 "logger",
                 "install"
@@ -46,7 +41,7 @@
     "testPresets": [
         {
             "name": "testing",
-            "configurePreset": "testing",
+            "configurePreset": "default",
             "output": {
                 "outputOnFailure": true
             },

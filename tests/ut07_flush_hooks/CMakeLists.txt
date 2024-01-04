@@ -12,4 +12,6 @@ target_compile_definitions(logger_test_proxy7 PUBLIC CONFIG_LOGGER_FLUSH_HOOKS=1
 add_executable(logger_ut07 ut07_flush_hooks.cpp)
 target_link_libraries(logger_ut07 PRIVATE logger_test_proxy7 logger_test_common)
 
+add_dependencies(logger_ut logger_ut07)
+
 gtest_discover_tests(logger_ut07)
