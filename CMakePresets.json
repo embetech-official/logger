@@ -38,7 +38,8 @@
             "name": "release",
             "configurePreset": "release",
             "targets": [
-                "logger"
+                "logger",
+                "install"
             ]
         }
     ],
