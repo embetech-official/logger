@@ -28,7 +28,7 @@ jobs:
       - name: Configure for release
         run: cmake --preset release
 
-      - name: Build Release
+      - name: Build release
         run: cmake --build --preset release
 
         
