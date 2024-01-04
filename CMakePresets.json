@@ -16,8 +16,7 @@
             "installDir": "${sourceDir}/release",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CONFIG_LOGGER_TESTS": "ON",
-                "CONFIG_LOGGER_ENABLE_INSTALL_TARGET": "ON"
+                "CMAKE_C_FLAGS": "-Werror -Wall -Wextra -Wpedantic -Wunused-parameter -Winit-self -Wcast-align -Wconversion -Wnull-dereference -Wduplicated-cond  -Wsign-conversion -Wlogical-op"
             }
         }
     ],
