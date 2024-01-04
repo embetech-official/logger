@@ -1,8 +1,13 @@
 enable_language(CXX)
 
-include(GoogleTest)
+cmake_policy(SET CMP0135 NEW)
+
+include(FetchContent)
+
+FetchContent_Declare(googletest URL https://github.com/google/googletest/archive/main.zip FIND_PACKAGE_ARGS NAMES GTest)
 
 FetchContent_MakeAvailable(googletest)
+include(GoogleTest)
 
 add_library(logger_test_common INTERFACE)
 target_compile_features(logger_test_common INTERFACE cxx_std_20)

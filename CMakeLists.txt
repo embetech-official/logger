@@ -59,8 +59,6 @@ set(CMAKE_MODULE_PATH
     CACHE INTERNAL "" FORCE
 )
 
-include(requirements.cmake)
-
 add_subdirectory(src)
 
 if (CONFIG_LOGGER_TESTS)
