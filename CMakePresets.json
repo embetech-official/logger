@@ -33,6 +33,13 @@
         {
             "name": "testing",
             "configurePreset": "testing"
+        },
+        {
+            "name": "release",
+            "configurePreset": "release",
+            "targets": [
+                "logger"
+            ]
         }
     ],
     "testPresets": [
