@@ -375,7 +375,7 @@ static size_t _ftoa(out_fct_type out, char* buffer, size_t idx, size_t maxlen, d
     int           whole = (int)value;
     double        tmp   = (value - whole) * pow10[prec];
     unsigned long frac  = (unsigned long)tmp;
-    diff                = tmp - frac;
+    diff                = tmp - (double)frac;
 
     if (diff > 0.5) {
         ++frac;
