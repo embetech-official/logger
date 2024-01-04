@@ -16,7 +16,7 @@
             "installDir": "${sourceDir}/release",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CONFIG_LOGGER_BUILD_TESTS": "ON",
+                "CONFIG_LOGGER_TESTS": "ON",
                 "CONFIG_LOGGER_ENABLE_INSTALL_TARGET": "ON"
             }
         }

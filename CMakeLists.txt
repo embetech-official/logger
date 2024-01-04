@@ -48,9 +48,9 @@ option(CONFIG_LOGGER_VERBOSE_ERRORS
        "Uses custom compiler pragmas to display additional debug information on compilation errors" OFF
 )
 
-option(CONFIG_LOGGER_BUILD_TESTS "Forces building test cases" ${PROJECT_IS_TOP_LEVEL})
+option(CONFIG_LOGGER_TESTS "Configures building test cases" ${PROJECT_IS_TOP_LEVEL})
 
-option(CONFIG_LOGGER_ENABLE_INSTALL_TARGET "Enables install target" ${PROJECT_IS_TOP_LEVEL})
+option(CONFIG_LOGGER_INSTALL "Configures install target" ${PROJECT_IS_TOP_LEVEL})
 
 set(EXTENDED_MODULE_PATH ${CMAKE_MODULE_PATH};${CMAKE_CURRENT_LIST_DIR}/cmake)
 list(REMOVE_DUPLICATES EXTENDED_MODULE_PATH)
@@ -63,7 +63,7 @@ include(requirements.cmake)
 
 add_subdirectory(src)
 
-if (CONFIG_LOGGER_BUILD_TESTS)
+if (CONFIG_LOGGER_TESTS)
   enable_testing()
-  add_subdirectory(tests)
+  add_subdirectory(tests EXCLUDE_FROM_ALL)
 endif ()
