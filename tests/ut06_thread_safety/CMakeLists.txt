@@ -7,7 +7,7 @@ list(TRANSFORM LOGGER_SOURCES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 
 add_library(logger_test_proxy6 ${LOGGER_SOURCES})
 target_include_directories(logger_test_proxy6 PUBLIC ${LOGGER_INCLUDES})
-target_compile_definitions(logger_test_proxy6 PUBLIC CONFIG_LOGGER_THREAD_SAFETY_HOOKS=1)
+target_compile_definitions(logger_test_proxy6 PUBLIC LOGGER_THREAD_SAFETY_HOOKS=1)
 
 add_executable(logger_ut06 ut06_thread_safety.cpp)
 target_link_libraries(logger_ut06 PRIVATE logger_test_proxy6 logger_test_common)

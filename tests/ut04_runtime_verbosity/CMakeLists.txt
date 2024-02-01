@@ -7,7 +7,7 @@ list(TRANSFORM LOGGER_SOURCES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 
 add_library(logger_test_proxy4 ${LOGGER_SOURCES})
 target_include_directories(logger_test_proxy4 PUBLIC ${LOGGER_INCLUDES})
-target_compile_definitions(logger_test_proxy4 PUBLIC CONFIG_LOGGER_RUNTIME_VERBOSITY=1)
+target_compile_definitions(logger_test_proxy4 PUBLIC LOGGER_RUNTIME_VERBOSITY=1)
 
 add_executable(logger_ut04 ut04_runtime_verbosity.cpp)
 target_link_libraries(logger_ut04 PRIVATE logger_test_proxy4 logger_test_common)

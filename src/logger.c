@@ -22,19 +22,19 @@ typedef struct {
     LOGGER_OutputFunction out;            ///< Channel's output function
     void*                 outContext;     ///< Output function's context
 
-#if 1 == CONFIG_LOGGER_THREAD_SAFETY_HOOKS
+#if 1 == LOGGER_THREAD_SAFETY_HOOKS
     LOGGER_LockFunction   lock;              ///< Channel's lock function
     LOGGER_UnlockFunction unlock;            ///< Channel's unlock function
     void*                 lockUnlockContext; ///< Lock/Unlock functions' context
 #endif
 
-#if 1 == CONFIG_LOGGER_TIMESTAMPS
+#if 1 == LOGGER_TIMESTAMPS
     LOGGER_TimeSourceFunction getTime; ///< Channel's time source function
 #endif
-#if 1 == CONFIG_LOGGER_RUNTIME_VERBOSITY
+#if 1 == LOGGER_RUNTIME_VERBOSITY
     LOGGER_level level; ///< Runtime parameter to determine whether the message should be printed
 #endif
-#if 1 == CONFIG_LOGGER_CUSTOM_AFFIXES
+#if 1 == LOGGER_CUSTOM_AFFIXES
 
     char const* prefix;       ///< Pointer to message prefix (MAY NOT be a c-string)
     size_t      prefixLength; ///< Prefix length
@@ -43,7 +43,7 @@ typedef struct {
     size_t      suffixLength; ///< Suffix length
 #endif
 
-#if 1 == CONFIG_LOGGER_FLUSH_HOOKS
+#if 1 == LOGGER_FLUSH_HOOKS
     LOGGER_FlushFunction flushHook;
     bool                 flushOnNewLine;
 #endif
@@ -51,7 +51,7 @@ typedef struct {
 
 
 static LOGGER_Descriptor LOGGER_RuntimeDescriptior = {
-#if 1 == CONFIG_LOGGER_RUNTIME_VERBOSITY
+#if 1 == LOGGER_RUNTIME_VERBOSITY
     .level = LOGGER_LEVEL_TRACE
 #else
     0 // Supress empty initialization list warning
@@ -60,7 +60,7 @@ static LOGGER_Descriptor LOGGER_RuntimeDescriptior = {
 static char const LOGGER_printableLevel[] = {'M', 'A', 'C', 'E', 'W', 'N', 'I', 'V', 'D', 'T'};
 
 
-#if 1 == CONFIG_LOGGER_CUSTOM_AFFIXES
+#if 1 == LOGGER_CUSTOM_AFFIXES
 void LOGGER_SetPrefix(char const* data, size_t length) {
     LOGGER_RuntimeDescriptior.prefix       = data;
     LOGGER_RuntimeDescriptior.prefixLength = length;
@@ -110,7 +110,7 @@ static inline void LOGGER_PrintSuffix(void) {
 #endif
 
 
-#if 1 == CONFIG_LOGGER_THREAD_SAFETY_HOOKS
+#if 1 == LOGGER_THREAD_SAFETY_HOOKS
 bool LOGGER_Lock(void) {
     // Return result if lock was successful or true, if lock function is not set
     return (LOGGER_RuntimeDescriptior.lock != NULL) ? LOGGER_RuntimeDescriptior.lock(LOGGER_RuntimeDescriptior.lockUnlockContext) : true;
@@ -151,7 +151,7 @@ bool LOGGER_SetLockingMechanism(LOGGER_LockFunction lock, LOGGER_UnlockFunction 
 #endif
 
 
-#if 1 == CONFIG_LOGGER_FLUSH_HOOKS
+#if 1 == LOGGER_FLUSH_HOOKS
 void LOGGER_SetFlushHook(LOGGER_FlushFunction hook, bool flushOnNewLine) {
     LOGGER_RuntimeDescriptior.flushHook      = hook;
     LOGGER_RuntimeDescriptior.flushOnNewLine = flushOnNewLine;
@@ -189,7 +189,7 @@ void LOGGER_PrintNL(void) {
 #endif
 
 
-#if 1 == CONFIG_LOGGER_RUNTIME_VERBOSITY
+#if 1 == LOGGER_RUNTIME_VERBOSITY
 LOGGER_level LOGGER_DoGetRuntimeLevel(void) {
     return LOGGER_RuntimeDescriptior.level;
 }
@@ -257,13 +257,13 @@ void LOGGER_EndSection(void) {
 void LOGGER_PrintHeader(LOGGER_HeaderDescriptor descr) {
     // Do not perform sanity checks - this is "internal function" that MUST be invoked in conjunction with LOGGER_Lock (which does sanity checks). By design it will not be invoked, if sanity check fails
     if (false == LOGGER_RuntimeDescriptior.headerDisabled) {
-#if 1 == CONFIG_LOGGER_TIMESTAMPS
+#if 1 == LOGGER_TIMESTAMPS
         uint32_t now = 0;
         if (LOGGER_RuntimeDescriptior.getTime != NULL) {
             now = LOGGER_RuntimeDescriptior.getTime();
         }
 
-#    if 1 == CONFIG_LOGGER_HUMAN_READABLE_TIMESTAMP
+#    if 1 == LOGGER_HUMAN_READABLE_TIMESTAMP
         uint32_t ms = now % UINT32_C(1000);
         now /= UINT32_C(1000);
         uint32_t seconds = now % UINT32_C(60);
@@ -281,7 +281,7 @@ void LOGGER_PrintHeader(LOGGER_HeaderDescriptor descr) {
 #    define LOGGER_TIME_ARGS
 #endif
 
-#if 1 == CONFIG_LOGGER_HEADER_WITH_LOCATION
+#if 1 == LOGGER_HEADER_WITH_LOCATION
 #    define LOGGER_LOCATION_FORMAT_STR " [%s:%d]"
 #    define LOGGER_LOCATION_ARGS       , descr.file, descr.line
 #else
@@ -309,7 +309,7 @@ void LOGGER_SetOutput(LOGGER_OutputFunction f, void* fContext) {
 
 
 void LOGGER_SetTimeSource(LOGGER_TimeSourceFunction f) {
-#if 1 == CONFIG_LOGGER_TIMESTAMPS
+#if 1 == LOGGER_TIMESTAMPS
     LOGGER_RuntimeDescriptior.getTime = f;
 #else
     (void)f; // Mark as unused
