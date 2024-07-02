@@ -9,7 +9,7 @@ add_library(logger_test_proxy5_1 ${LOGGER_SOURCES})
 target_include_directories(logger_test_proxy5_1 PUBLIC ${LOGGER_INCLUDES})
 target_compile_definitions(logger_test_proxy5_1 PUBLIC LOGGER_HEADER_WITH_LOCATION=1 LOGGER_FILE="OVERRIDEN")
 
-add_executable(logger_ut05_1 ut05_1_location.cpp)
+add_executable(logger_ut05_1 ut05_1_location.cpp ut05_1_location.c)
 target_link_libraries(logger_ut05_1 PRIVATE logger_test_proxy5_1 logger_test_common)
 
 add_library(logger_test_proxy5_2 ${LOGGER_SOURCES})
@@ -34,6 +34,7 @@ target_link_libraries(logger_ut05_3 PRIVATE logger_test_proxy5_3 logger_test_com
 add_dependencies(logger_ut logger_ut05_1)
 add_dependencies(logger_ut logger_ut05_2)
 add_dependencies(logger_ut logger_ut05_3)
+
 
 gtest_discover_tests(logger_ut05_1)
 gtest_discover_tests(logger_ut05_2)

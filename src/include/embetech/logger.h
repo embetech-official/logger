@@ -532,7 +532,7 @@ typedef struct {
 #    ifdef __cplusplus
 #        define LOGGER_HEADER_DESCR(lvl) (LOGGER_HeaderDescriptor{.level = lvl, .channel = LOGGER_HEADER "", .file = LOGGER_FILE "", .line = __LINE__})
 #    else
-#        define LOGGER_HEADER_DESCR(lvl) (LOGGER_HeaderDescriptor){.level = lvl, .channel = LOGGER_HEADER "", .file = LOGGER_FILE "", .line = __LINE__})
+#        define LOGGER_HEADER_DESCR(lvl) ((LOGGER_HeaderDescriptor){.level = lvl, .channel = LOGGER_HEADER "", .file = LOGGER_FILE "", .line = __LINE__})
 #    endif
 #else
 

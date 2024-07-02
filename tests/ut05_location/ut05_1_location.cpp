@@ -1,7 +1,10 @@
-#include <gtest/gtest.h>
 #include <embetech/logger.h>
+#include <gtest/gtest.h>
 
 #include <sstream>
+
+
+extern "C" void log_test_message(void); // defined in ut05_1_location.c
 
 
 TEST(LOGGER, UT05_CodeLocation) {
@@ -17,9 +20,15 @@ TEST(LOGGER, UT05_CodeLocation) {
 
     char const* const msg = "test message";
     {
+        char const* const expected = "DEFAULT (N) [OVERRIDEN:1]: test message\n";
+
 #line 1
-        char const* const expected = "DEFAULT (N) [OVERRIDEN:2]: test message\n";
         LOGGER_NOTICE(msg);
+
+        EXPECT_EQ(expected, received.str());
+        clear_output();
+
+        log_test_message();
         EXPECT_EQ(expected, received.str());
         clear_output();
     }
@@ -29,6 +38,10 @@ TEST(LOGGER, UT05_CodeLocation) {
     {
         char const* const expected = "test message\n";
         LOGGER_WARNING(msg);
+        EXPECT_EQ(expected, received.str());
+        clear_output();
+
+        log_test_message();
         EXPECT_EQ(expected, received.str());
         clear_output();
     }
