@@ -51,6 +51,7 @@ set(CMAKE_MODULE_PATH
 add_subdirectory(src)
 
 if (LOGGER_TESTS OR PROJECT_IS_TOP_LEVEL)
+  include(CTest)
   enable_testing()
   add_subdirectory(tests EXCLUDE_FROM_ALL)
 endif ()
