@@ -12,7 +12,7 @@ configure_package_config_file(
 
 install(TARGETS logger EXPORT logger_targets)
 
-install(DIRECTORY include/embetech DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(DIRECTORY src/include/embetech DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/logger-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/logger-config-version.cmake
         DESTINATION ${CMAKES_EXPORT_DIR}

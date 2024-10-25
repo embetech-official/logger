@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(logger VERSION 1.1.5)
+project(logger VERSION 1.1.6)
 
 include(CMakeDependentOption)
 
@@ -38,7 +38,7 @@ option(LOGGER_VERBOSE_ERRORS
        "Uses custom compiler pragmas to display additional debug information on compilation errors" OFF
 )
 
-option(LOGGER_TESTS "Build test cases" OFF)
+option(LOGGER_TESTS "Build test cases" ${PROJECT_IS_TOP_LEVEL})
 option(LOGGER_INSTALL "Configure install target" ON)
 
 set(EXTENDED_MODULE_PATH ${CMAKE_MODULE_PATH};${CMAKE_CURRENT_LIST_DIR}/cmake)
@@ -50,8 +50,13 @@ set(CMAKE_MODULE_PATH
 
 add_subdirectory(src)
 
-if (LOGGER_TESTS OR PROJECT_IS_TOP_LEVEL)
+if (LOGGER_TESTS)
   include(CTest)
-  enable_testing()
   add_subdirectory(tests EXCLUDE_FROM_ALL)
+endif ()
+
+
+
+if (LOGGER_INSTALL OR PROJECT_IS_TOP_LEVEL)
+  include(cmake/install.cmake)
 endif ()
