@@ -1,10 +1,10 @@
 # LOGGER - Lightweight, portable formatted logging component
 
-[![C++ Unit Tests](https://github.com/embetech-official/logger/actions/workflows/cpp_unit_tests.yml/badge.svg)](https://github.com/embetech-official/logger/actions/workflows/cpp_unit_tests.yml)
+[![On Push](https://github.com/embetech-official/logger/actions/workflows/on_push.yml/badge.svg)](https://github.com/embetech-official/logger/actions/workflows/on_push.yml)
 
 ## Overview
 
-Logger is a lightweight and portable logging component written in C99, with some preprocessor magic (but C99-compliant (... yet magical :)) ).
+Logger is a lightweight and portable logging component written in C99, with some preprocessor magic (still C99-compliant).
 
 Features:
 
@@ -109,14 +109,14 @@ In order to stay flexible and minimalistic logger uses compile-time configuratio
 If turned on, the Logger header format will contain timestamp, acquired from the user defined callback via LOGGER_SetTimeSource function:
 
 ```C
-LOGGER_SetTimeSource([](){return std::uint32_t(8000085);}); // Short C++ lambda to save the world
+LOGGER_SetTimeSource([](){return std::uint32_t(1);}); // Short C++ lambda to save the world
 LOGGER_INFO("test message");
 ```
 
 will be printed as (assuming DEFAULT channel):
 
 ```shell
-8000085 DEFAULT (I): test message
+1 DEFAULT (I): test message
 ```
 
 ### LOGGER_HUMAN_READABLE_TIMESTAMP
