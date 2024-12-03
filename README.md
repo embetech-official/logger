@@ -4,7 +4,7 @@
 ![GitHub License](https://img.shields.io/github/license/embetech-official/logger)
 ![GitHub Release](https://img.shields.io/github/v/release/embetech-official/logger)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/60b12b600a6842f8bf1e81a29c2ad4fe)](https://app.codacy.com/gh/embetech-official/logger/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-
+[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-highlight.svg)](https://sonarcloud.io/summary/new_code?id=embetech-official_logger)
 ## Overview
 
 Logger is a lightweight and portable logging component written in C99, with some preprocessor magic (still C99-compliant).
