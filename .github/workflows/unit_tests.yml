@@ -1,4 +1,4 @@
-name: On Push
+name: Unit Tests
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Configure
-        run: cmake --preset default
+        run: cmake --preset native
 
       - name: Build tests
         run: cmake --build --preset testing
@@ -25,7 +25,7 @@ jobs:
         run: ctest --preset testing
 
       - name: Build release
-        run: cmake --build --preset release
+        run: cmake --build --preset install
 
         
 

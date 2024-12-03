@@ -8,39 +8,42 @@
     "include": [],
     "configurePresets": [
         {
-            "name": "default",
-            "displayName": "Default",
-            "description": "Default build configuration",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build",
-            "installDir": "${sourceDir}/release",
+            "name": "native",
+            "displayName": "Native",
+            "description": "Let CMake choose the compiler",
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "installDir": "${sourceDir}/build/${presetName}/install",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_C_FLAGS": "-Werror -Wall -Wextra -Wpedantic -Wunused-parameter -Winit-self -Wcast-align -Wconversion -Wnull-dereference -Wduplicated-cond  -Wsign-conversion -Wlogical-op"
+                "CMAKE_CXX_SCAN_FOR_MODULES": "OFF",
+                "CMAKE_CONFIGURATION_TYPES": "Release;Debug",
+                "CMAKE_DEFAULT_BUILD_TYPE": "Release",
+                "CMAKE_DEBUG_POSTFIX": "-debug",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            },
+            "environment": {
+                "CFLAGS": "-Wall -Wextra -Wpedantic -Wunused-parameter -Winit-self -Wcast-align -Wconversion -Wnull-dereference -Wduplicated-cond  -Wsign-conversion -Wlogical-op",
+                "CXXFLAGS": "-Wall -Wextra -Wpedantic -Wunused-parameter -Winit-self -Wcast-align -Wconversion -Wnull-dereference -Wduplicated-cond  -Wsign-conversion -Wlogical-op"
             }
         }
     ],
     "buildPresets": [
         {
             "name": "testing",
-            "configurePreset": "default",
-            "targets": [
-                "logger_ut"
-            ]
+            "configurePreset": "native",
+            "targets": "logger_ut",
+            "configuration": "Debug"
         },
         {
-            "name": "release",
-            "configurePreset": "default",
-            "targets": [
-                "logger",
-                "install"
-            ]
+            "name": "install",
+            "configurePreset": "native",
+            "targets": "install"
         }
     ],
     "testPresets": [
         {
             "name": "testing",
-            "configurePreset": "default",
+            "configurePreset": "native",
             "output": {
                 "outputOnFailure": true
             },
