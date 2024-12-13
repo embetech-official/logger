@@ -48,7 +48,7 @@ option(LOGGER_VERBOSE_ERRORS
 option(LOGGER_TESTS "Build test cases" ${PROJECT_IS_TOP_LEVEL})
 option(LOGGER_INSTALL "Configure install target" ON)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
+include(cmake/logger_utils.cmake)
 
 add_subdirectory(src)
 
