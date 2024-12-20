@@ -71,10 +71,25 @@ function (logger_set_max_level target)
     if (NOT level IN_LIST allowed_levels)
       message(FATAL_ERROR "Invalid log level: ${level} in expression '${entry_str}'")
     endif ()
+    get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+    if (is_multi_config)
+      # All entries are appended as a generator expression
+      set(config_entry
+          "$<$<CONFIG:${build_type}>:${channel}_LOG_CHANNEL_LEVEL=LOGGER_LEVEL_${level}>"
+      )
+    else ()
+      # Set value only for matching build type
+      if (CMAKE_BUILD_TYPE)
+        string(TOUPPER "${CMAKE_BUILD_TYPE}" actual_build_type)
+      else ()
+        message(NOTICE "CMAKE_BUILD_TYPE not set. Using default build type 'Release'")
+        set(actual_build_type "RELEASE")
+      endif ()
 
-    set(config_entry
-        "$<$<CONFIG:${build_type}>:${channel}_LOG_CHANNEL_LEVEL=LOGGER_LEVEL_${level}>"
-    )
+      if (build_type STREQUAL ${actual_build_type})
+        set(config_entry ${channel}_LOG_CHANNEL_LEVEL=LOGGER_LEVEL_${level})
+      endif ()
+    endif ()
     list(APPEND compile_definitions "${config_entry}")
   endforeach ()
 
