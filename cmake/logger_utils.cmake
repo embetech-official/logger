@@ -16,7 +16,7 @@ function (logger_set_max_level target)
     message(FATAL_ERROR "Target ${target} does not exist")
   endif ()
 
-  set(flags)
+  set(flags QUIET)
   set(single CHANNEL)
   set(multi CONFIG)
   cmake_parse_arguments(PARSE_ARGV 1 arg "${flags}" "${single}" "${multi}")
@@ -35,7 +35,7 @@ function (logger_set_max_level target)
     message(FATAL_ERROR "No log configuration specified for channel ${channel}")
   endif ()
 
-  set(used_build_types)
+  set(quiet ${arg_QUIET})
 
   set(allowed_levels
       "DISABLED"
@@ -51,46 +51,68 @@ function (logger_set_max_level target)
       "TRACE"
   )
 
+  get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+  if (is_multi_config)
+    set(expected_build_types ${CMAKE_CONFIGURATION_TYPES})
+  else ()
+    if (CMAKE_BUILD_TYPE)
+      set(single_build_type "${CMAKE_BUILD_TYPE}")
+    else ()
+      set(single_build_type "Release")
+      if (NOT quiet)
+        message(WARNING "CMAKE_BUILD_TYPE not set. Using default build type '${single_build_type}'")
+      endif ()
+    endif ()
+
+    set(expected_build_types ${single_build_type})
+  endif ()
+
+  set(used_build_types)
+
   foreach (entry_str IN LISTS arg_CONFIG)
     string(REPLACE ":" ";" entry "${entry_str}")
-    string(TOUPPER "${entry}" entry)
 
     list(LENGTH entry entry_len)
     if (NOT entry_len EQUAL 2)
-      message(FATAL_ERROR "Invalid configuration string: ${entry_str}")
+      message(FATAL_ERROR "Invalid configuration entry: ${entry_str}")
     endif ()
 
     list(GET entry 0 build_type)
+
     list(GET entry 1 level)
+    string(TOUPPER "${level}" level)
 
     if (build_type IN_LIST used_build_types)
-      message(FATAL_ERROR "Duplicate build type: ${build_type} in expression '${entry_str}'")
+      message(FATAL_ERROR "Duplicate build type: ${build_type} in entry '${entry_str}'")
     endif ()
     list(APPEND used_build_types ${build_type})
 
     if (NOT level IN_LIST allowed_levels)
-      message(FATAL_ERROR "Invalid log level: ${level} in expression '${entry_str}'")
+      message(FATAL_ERROR "Invalid log level: '${level}' in entry '${entry_str}'")
     endif ()
-    get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+
     if (is_multi_config)
       # All entries are appended as a generator expression
       set(config_entry
           "$<$<CONFIG:${build_type}>:${channel}_LOG_CHANNEL_LEVEL=LOGGER_LEVEL_${level}>"
       )
+
     else ()
       # Set value only for matching build type
-      if (CMAKE_BUILD_TYPE)
-        string(TOUPPER "${CMAKE_BUILD_TYPE}" actual_build_type)
-      else ()
-        message(NOTICE "CMAKE_BUILD_TYPE not set. Using default build type 'Release'")
-        set(actual_build_type "RELEASE")
-      endif ()
-
-      if (build_type STREQUAL ${actual_build_type})
+      if (build_type STREQUAL ${single_build_type})
         set(config_entry ${channel}_LOG_CHANNEL_LEVEL=LOGGER_LEVEL_${level})
       endif ()
     endif ()
     list(APPEND compile_definitions "${config_entry}")
+  endforeach ()
+
+  # Make sure that ALL of the build types, used in the project are covered
+  foreach (type IN LISTS expected_build_types)
+    if (NOT type IN_LIST used_build_types)
+      if (NOT quiet)
+        message(WARNING "Missing log configuration for build type: ${type}")
+      endif ()
+    endif ()
   endforeach ()
 
   message(DEBUG "compile_definitions for target ${target}: ${compile_definitions}")
