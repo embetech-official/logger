@@ -23,7 +23,7 @@ cmake_dependent_option(
 option(LOGGER_CUSTOM_AFFIXES "Enables function set to add custom message affixes" OFF)
 
 option(LOGGER_RUNTIME_VERBOSITY
-       "Enables changing logger verbosity at runtime via LOGGER_SetRuntimeLevel function" OFF
+       "Enables changing logger verbosity at runtime via LOGGER_SetRuntimeLevel function" ON
 )
 
 option(
