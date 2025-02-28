@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(logger VERSION 1.2.4)
+project(logger VERSION 1.2.5)
 
 include(CMakeDependentOption)
 
