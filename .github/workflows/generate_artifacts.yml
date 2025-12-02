@@ -24,7 +24,7 @@ jobs:
     env:
       preset: ${{ matrix.config.toolchain }}::${{ matrix.config.architecture }}
     steps:
-      - uses: lukka/get-cmake@latest
+      # - uses: lukka/get-cmake@latest
 
       - uses: actions/checkout@v4
 

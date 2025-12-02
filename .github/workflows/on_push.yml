@@ -11,8 +11,8 @@ jobs:
     runs-on: [self-hosted, linux, x64]
     steps:
      - uses: actions/checkout@v4
-     - uses: ssciwr/doxygen-install@v1
-     - uses: lukka/get-cmake@latest
+    #  - uses: ssciwr/doxygen-install@v1
+    #  - uses: lukka/get-cmake@latest
      - uses: lukka/run-cmake@v10
        with:
          workflowPreset: 'default'
