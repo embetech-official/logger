@@ -1,26 +1,26 @@
-# LOGGER - Lightweight, portable formatted logging component
+# LOGGER — Lightweight, Portable, Formatted Logging Component
 
 [![Unit Tests](https://github.com/embetech-official/logger/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/embetech-official/logger/actions/workflows/unit_tests.yml)
 ![GitHub License](https://img.shields.io/github/license/embetech-official/logger)
 ![GitHub Release](https://img.shields.io/github/v/release/embetech-official/logger)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/60b12b600a6842f8bf1e81a29c2ad4fe)](https://app.codacy.com/gh/embetech-official/logger/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-highlight.svg)](https://sonarcloud.io/summary/new_code?id=embetech-official_logger)
+
 ## Overview
 
-Logger is a lightweight and portable logging component written in C99, with some preprocessor magic (still C99-compliant).
+Logger is a lightweight and portable logging component written in C99, with some preprocessor utilities (still C99-compliant).
 
 Features:
 
-- Supports printf-compliant format syntax
-- Built in format syntax checking on (GNU compilers)
-- Unlimited amount of compile-time channels
-- SYSLOG compatibile verbosity levels
+- Supports `printf`-compliant format syntax
+- Built-in format syntax checking (GNU compilers)
+- Unlimited number of compile-time channels
+- SYSLOG-compatible verbosity levels
 - Runtime output stream selection
-- Thread-safe mechanisms ready
+- Thread-safety hooks available
 
-The library consists of two parts: compile-time channel and verbosity selection, as well as some runtime switches.
+The library consists of two parts: compile-time channel/verbosity selection and runtime switches.
 
-For each channel you may specify maximum verbosity level that will be compiled - messages with higher verbosity will be optimized-out from build, thus reducing memory requirements.
+For each channel you may specify the maximum verbosity level that will be compiled — messages with higher verbosity are optimized out from the build, reducing memory requirements.
 
 ## Quick Start
 
@@ -37,9 +37,9 @@ FetchContent_MakeAvailable(logger)
 
 ## Configuration
 
-### Translation unit configuration
+### Translation Unit Configuration
 
-Simply add channel definition at the beginning of your source file:
+Add the channel definition at the beginning of your source file:
 
 ```C
 #include <embetech/logger.h>
@@ -51,14 +51,14 @@ void example_function(void) {
 }
 ```
 
-This will result in the following log message: 
+This will produce the following log messages:
 
 ```shell
 DEFAULT (I): eat veggies
 DEFAULT (W): ... or else 3:>
 ```
 
-You can assing your source file to compile-time **Log Channel** to enable precise verbosity configuration. The **Log Channel** will be visible in message's header:
+You can assign your source file to a compile-time **Log Channel** to enable precise verbosity configuration. The **Log Channel** will be visible in the message header:
 
 ``` C
 #define LOGGER_CHANNEL FOOBAR
@@ -77,19 +77,19 @@ This will result in the following log message:
 FOOBAR (I): eating veggies is fun
 ```
 
-Logger is capable of controling which messages are compiled into your binary file. You can control this by setting each channel verbosity. If you don't specify verbosity for a channel, it will remain disabled
+Logger can control which messages are compiled into your binary. You control this by setting each channel's verbosity. If you don't specify a verbosity for a channel, it remains disabled.
 
-### Verbosity configuration
+### Verbosity Configuration
 
-Global configuration shall be stored in logger_config.h file The example below presents all configuration options with their default values:
+Global configuration should be stored in `logger_config.h`. The example below presents all configuration options with their default values:
 
  ```C
 #ifndef LOGGER_CONFIG_H_ // Include guard naming convention is not enforced, but endorsed :)
 #define LOGGER_CONFIG_H_
 
-#define LOGGER_ENABLED 1 ///< Main Component On/Off switch. If set to 0, even if every other conditions are met, logger will write nothing
+#define LOGGER_ENABLED 1 ///< Main component On/Off switch. If set to 0, even if every other condition is met, the logger will write nothing.
 
-/********* THIS IS THE PART WHERE YOU SPECIFY YOUR OWN CHANNELS AND SUBCHANNELS *********/
+/********* SPECIFY YOUR OWN CHANNELS BELOW *********/
 
 #define COMPONENT1_LOG_CHANNEL_LEVEL LOGGER_LEVEL_INFO ///< Verbosity setting for channel COMPONENT1
 
@@ -103,20 +103,20 @@ Global configuration shall be stored in logger_config.h file The example below p
 #endif // That's all folks
  ```
 
-### Features configuration
+### Features Configuration
 
-In order to stay flexible and minimalistic logger uses compile-time configuration options that will affect global behaviour. The list below reflects options available in CMakeLists.txt file:
+To stay flexible and minimalistic, the logger uses compile-time configuration options that affect global behavior. The list below reflects options available in the `CMakeLists.txt` file:
 
 ### LOGGER_TIMESTAMPS
 
-If turned on, the Logger header format will contain timestamp, acquired from the user defined callback via LOGGER_SetTimeSource function:
+If enabled, the logger header contains a timestamp acquired from a user-defined callback via `LOGGER_SetTimeSource`:
 
 ```C
-LOGGER_SetTimeSource([](){return std::uint32_t(1);}); // Short C++ lambda to save the world
+LOGGER_SetTimeSource([](){return std::uint32_t(1);}); // Short C++ lambda
 LOGGER_INFO("test message");
 ```
 
-will be printed as (assuming DEFAULT channel):
+Printed as (assuming DEFAULT channel):
 
 ```shell
 1 DEFAULT (I): test message
@@ -124,8 +124,8 @@ will be printed as (assuming DEFAULT channel):
 
 ### LOGGER_HUMAN_READABLE_TIMESTAMP
 
-This option is available only when LOGGER_TIMESTAMPS is ON.
-Changes the format of timestamp to hh:mm::ss.ms:
+Available only when `LOGGER_TIMESTAMPS` is ON.
+Changes the timestamp format to `hh:mm:ss.ms`:
 
 ```shell
 02:13:20.085 DEFAULT (I): test message
@@ -133,9 +133,9 @@ Changes the format of timestamp to hh:mm::ss.ms:
 
 ### LOGGER_CUSTOM_AFFIXES
 
-Allows setting custom prefix/suffix for every Logger message, using LOGGER_SetPrefix/LOGGER_SetSuffix function.
-Both will be printed as binary data, so no '\0' termination is required.
-This feature might be useful when working with custom terminal protocols.
+Allows setting a custom prefix/suffix for every logger message using `LOGGER_SetPrefix`/`LOGGER_SetSuffix`.
+Both are printed as binary data, so no '\0' termination is required.
+Useful when working with custom terminal protocols.
 
 ```C
         LOGGER_SetPrefix("pre- ", 5U);
@@ -143,7 +143,7 @@ This feature might be useful when working with custom terminal protocols.
         LOGGER_NOTICE("test message1");
 ```
 
-will produce
+Produces:
 
 ```shell
 pre- DEFAULT (N): test message -post
@@ -151,7 +151,7 @@ pre- DEFAULT (N): test message -post
 
 ### LOGGER_RUNTIME_VERBOSITY
 
-Enables reducing verbosity of printed messages AT RUNTIME using  LOGGER_SetRuntimeLevel function. Of course, compile time level is still stronger so the resulting set of messages will be no greater than both:
+Enables reducing verbosity of printed messages at runtime using `LOGGER_SetRuntimeLevel`. Compile-time level still applies, so the resulting set of messages is bounded by both:
 
  ```C
     LOGGER_NOTICE("test message1");
@@ -162,24 +162,24 @@ Enables reducing verbosity of printed messages AT RUNTIME using  LOGGER_SetRunti
 
 ```
 
-will produce
+Produces:
 
 ```shell
 DEFAULT (N): test message1
 DEFAULT (N): test message3
 ```
 
-the second message will not be printed, however its code is still available to be enabled (assuming that DEFAULT_LOG_CHANNEL_LEVEL is at least at NOTICE)
+The second message is not printed; however, its code remains available to be enabled (assuming that `DEFAULT_LOG_CHANNEL_LEVEL` is at least `NOTICE`).
 
 ### LOGGER_HEADER_WITH_LOCATION
 
-Expands the header with code location [file:line]:
+Expands the header with code location `[file:line]`:
 
 ```shell
 DEFAULT (N) [x:\long_path\file.cpp:66]: test message
 ```
 
-Since file paths might be pretty long, we added CMake util to override compiler-generated file names with shorter versions:
+Since file paths might be long, a CMake utility can override compiler-generated file names with shorter versions:
 
 ``` cmake
 # assuming the logger library is already found
@@ -187,7 +187,7 @@ include(logger_utils)
 logger_normalize_printable_filenames()
 ```
 
-this would change the above message to
+This changes the above message to:
 
 ```shell
 DEFAULT (N) [file.cpp:66]: test message
@@ -195,18 +195,18 @@ DEFAULT (N) [file.cpp:66]: test message
 
 ### LOGGER_THREAD_SAFETY_HOOKS
 
-By design, logger is as thread-safe as your output callback (so probably no).
-When this option is enabled. Logger will use user-provided lock/unlock functions to ensure thread safety.
-To do so, you should register lock/unlock callbacks:
+By design, the logger is as thread-safe as your output callback (often: not).
+When this option is enabled, the logger uses user-provided lock/unlock functions to ensure thread safety.
+Register lock/unlock callbacks:
 
 ``` C
 static Mutex_t myMutex;
 
 bool myLockFunction(void* context) {
-    int const customTimeoutMS = 100; // If your mutex requires timeout. you may also wrap it in terms of context
-    int const mutexSuccess = 69; // Assuming that Mutex_Take return 69 on success
+    int const customTimeoutMS = 100; // If your mutex requires a timeout
+    int const mutexSuccess = 69; // Assuming that Mutex_Take returns 69 on success
     Mutex_t* mutex = (Mutex_t*)context;
-    return mutexSuccess == Mutex_Take(mutex, customTimeoutMS); // let's assume that if succeded, the function returns 69
+    return mutexSuccess == Mutex_Take(mutex, customTimeoutMS);
 }
 
 void myUnlockFunction(void* context) {
@@ -217,13 +217,13 @@ void myUnlockFunction(void* context) {
 LOGGER_SetLockingMechanism(myLockFunction, myUnlockFunction, &myMutex);
 ```
 
-The API of callbacks is fairly universal... You might be able to simply plug your OS's mutex functions.
+The callback API is universal — you can often plug your OS's mutex functions.
 
-LOGGER will always try to lock before printing message. In scoped printing case, The lock will be acquired by LOGGER_START, and released by LOGGER_END/LOGGER_ENDL.
+The logger always tries to lock before printing a message. In scoped printing, the lock is acquired by `LOGGER_START` and released by `LOGGER_END`/`LOGGER_ENDL`.
 
 ### LOGGER_FLUSH_HOOKS
 
-Enables user to bind function, to flush output. The function may either be called explicitly, using LOGGER_Flush(), or automatically on the end of each message (So every LOGGER_INFO/etc. or after each LOGGER_END/LOGGER_ENDL):
+Enables binding a function to flush the output. The function may be called explicitly using `LOGGER_Flush()`, or automatically at the end of each message (i.e., every `LOGGER_INFO`/etc., or after each `LOGGER_END`/`LOGGER_ENDL`):
 
 ```C
 LOGGER_DisableHeader();
@@ -237,7 +237,7 @@ LOGGER_SetFlushHook([](){puts("polo!!");}, true); // now logger will flush autom
 LOGGER_NOTICE("marco!");
 ```
 
-would print
+Would print:
 
 ```shell
 marco?
@@ -250,12 +250,13 @@ polo!!
 
 ### LOGGER_VERBOSE_ERRORS
 
-When user messed up, it may be difficult to dig through all preprocessor magic. When this option is enabled, and your compiler is eiter clang or GCC-like, each compile-time error will be appended with message, which logger channel was the culprit
+When a user makes a mistake, preprocessor errors can be hard to parse. If enabled, and your compiler is either Clang or GCC-like, each compile-time error is appended with information indicating which logger channel caused the issue.
 
 ## Usage
 
-### Minimal configuration
-In order to make the logger print anything, you have to provide output function callback beforehand:
+### Minimal Configuration
+
+To make the logger print anything, you must provide the output function callback first:
 
 ``` C
 void out(char c, void* context) {
@@ -266,23 +267,22 @@ void out(char c, void* context) {
 LOGGER_SetOutput(out, NULL);
 ```
 
-You may provide context for your function and it will be stored until next invocation of LOGGER_SetOutput.
-The next step is to enable logger:
+You may provide a context pointer for your function; it is stored until the next invocation of `LOGGER_SetOutput`.
+Next, enable the logger:
 
 ``` C
-assert(LOGGER_Enable()); // Assert SHOULD be skipped, as this funtion is probably not that critical... Yet the function returns whether the logger was enabled
+assert(LOGGER_Enable()); // The function returns whether the logger was enabled
 ```
 
-## Logging messages
+## Logging Messages
 
-We prepared two intended ways to produce log messages. Both will be presented in example below:
+There are two intended ways to produce log messages. Both are presented below:
 
 ``` C
 void example_function(void) {
     LOGGER_TRACE("Trace message. Rarely enabled");
     LOGGER_DEBUG("Entering function in " __FILE__ ":%d", __LINE__);
     LOGGER_VERBOSE("Attempting to start to defuse the nuke");
-    LOGGER_INFO("Nuke defusal kit prepared");
     LOGGER_NOTICE("Nuke defusing started");
     LOGGER_WARNING("The Apple authorized service might not be the best place to fix the bomb");
     LOGGER_ERROR("Screwdriver broken");
@@ -292,25 +292,24 @@ void example_function(void) {
     LOGGER_DISABLED("There is no bright light at the end of the tunnel"); // Actually useful, when you want to disable some low level debugging messages in low latency code, and not comment it out (remember: commented-out code is a bad code)
 
     LOGGER_START(NOTICE);
-    int trainingMsgNo = 42; // Notice that the scope of trainingMsgNo is reduced to LOGGER_START/LOGGER_ENDL
+    int trainingMsgNo = 42; // Scope reduced to LOGGER_START/LOGGER_ENDL
     LOGGER_CONTINUE("\n --- This was a training message no %d: \n", trainingMsgNo);
     LOGGER_CONTINUE("%s\n", getPrintableMsgNo(trainingMsgNo));
-    LOGGER_CONTINUE("you may log as many information, as you wish.\n");
+    LOGGER_CONTINUE("you may log as much information as you wish.\n");
     LOGGER_CONTINUE("log channel between LOGGER_START and LOGGER_END is locked");
-    LOGGER_CONTINUE("(assuming you implemented locking mechanism)");
+    LOGGER_CONTINUE("(assuming you implemented a locking mechanism)");
     LOGGER_ENDL();
     
     LOGGER_NOTICE("bananas.")
 }
 ```
 
-This will produce the following output:
+This produces the following output:
 
 ```shell
 DEFAULT (T): Trace message. Rarely enabled
 DEFAULT (D): Entering function in ./example.c:499
 DEFAULT (V): Attempting to start to defuse the nuke
-DEFAULT (I): Nuke defusal kit prepared
 DEFAULT (N): Nuke defusing started
 DEFAULT (W): The Apple authorized service might not be the best place to fix the bomb
 DEFAULT (E): Screwdriver broken
@@ -322,9 +321,9 @@ DEFAULT (N):
 foo
 you may log as many information, as you wish.
 log channel between LOGGER_START and LOGGER_END is locked(assuming you implemented locking mechanism)
-DEFAULT    (N): bananas
+DEFAULT (N): bananas
 ```
 
-### Header runtime control
+### Header Runtime Control
 
-User may disable printing header, simply using LOGGER_EnableHeader/LOGGER_DisableHeader functions
+You can disable/enable printing the header using `LOGGER_EnableHeader` / `LOGGER_DisableHeader`.
