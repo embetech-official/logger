@@ -1,3 +1,21 @@
+add_library(logger STATIC)
+add_library(embetech::logger ALIAS logger)
+target_compile_features(logger PUBLIC c_std_99)
+
+target_sources(
+  logger
+  PRIVATE logger.c third_party/printf.c
+  PUBLIC FILE_SET HEADERS BASE_DIRS include FILES include/embetech/logger.h
+  PRIVATE FILE_SET
+          private_headers
+          TYPE
+          HEADERS
+          BASE_DIRS
+          third_party
+          FILES
+          third_party/printf.h
+)
+
 message(
   DEBUG
   "Selected logger options:
@@ -15,14 +33,6 @@ message(
 - LOGGER_TESTS: ${LOGGER_TESTS}"
 )
 
-add_library(logger STATIC logger.c third_party/printf.c)
-
-target_include_directories(
-  logger
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>
-  PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/third_party>
-)
-
 target_compile_definitions(
   logger
   PRIVATE PRINTF_SUPPORT_FLOAT=$<BOOL:${LOGGER_FP_SUPPORT}>
@@ -37,7 +47,3 @@ target_compile_definitions(
          LOGGER_FLUSH_HOOKS=$<BOOL:${LOGGER_FLUSH_HOOKS}>
          LOGGER_VERBOSE_ERRORS=$<BOOL:${LOGGER_VERBOSE_ERRORS}>
 )
-
-target_compile_features(logger PUBLIC c_std_99)
-
-add_library(embetech::logger ALIAS logger)

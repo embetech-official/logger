@@ -1,0 +1,49 @@
+name: Generate Artifacts
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  library:
+    runs-on: [self-hosted, linux, x64]
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { toolchain: gcc, architecture: x86_64-linux-gnu }
+          - { toolchain: gcc, architecture: x86_64-windows-gnu }
+          - { toolchain: gcc, architecture: aarch64-linux-gnu }
+          - { toolchain: gcc, architecture: aarch32-linux-gnu }
+          - { toolchain: gcc, architecture: thumbv6m-none-eabi }
+          - { toolchain: gcc, architecture: thumbv7em-none-eabi }
+          - { toolchain: gcc, architecture: thumbv7em-none-eabihf}
+          - { toolchain: gcc, architecture: thumbv7m-none-eabi }
+          - { toolchain: gcc, architecture: thumbv8m.base-none-eabi }
+          - { toolchain: gcc, architecture: thumbv8m.main-none-eabihf }
+    env:
+      preset: ${{ matrix.config.toolchain }}::${{ matrix.config.architecture }}
+    steps:
+      - uses: lukka/get-cmake@latest
+
+      - uses: actions/checkout@v4
+
+      - uses: robinraju/release-downloader@v1
+        with:
+          repository: embetech-official/cmake-presets
+          tag: v0.0.1
+          fileName: CMakeUserPresets.json
+
+      - uses: lukka/run-cmake@v10
+        with:
+          configurePreset: ${{ env.preset }}
+          configurePresetAdditionalArgs: '["-DLOGGER_TESTS=0", "-DCRC_DOC=0", "-DCRC_EXAMPLES=0"]'
+          buildPreset: ${{ env.preset }}::install
+
+      - name: Upload library install directory
+        uses: actions/upload-artifact@v4
+        with:
+          name: liblogger-${{ matrix.config.architecture }}
+          path: |
+            install/${{ env.preset }}/**
+          if-no-files-found: error

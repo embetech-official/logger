@@ -1,49 +1,57 @@
 {
     "version": 6,
-    "cmakeMinimumRequired": {
-        "major": 3,
-        "minor": 20,
-        "patch": 0
-    },
-    "include": [],
     "configurePresets": [
         {
-            "name": "native",
-            "displayName": "Native",
-            "description": "Let CMake choose the compiler",
+            "name": "gcc-native",
+            "description": "Use any available GNU compiler",
             "generator": "Ninja Multi-Config",
             "binaryDir": "${sourceDir}/build/${presetName}",
-            "installDir": "${sourceDir}/build/${presetName}/install",
+            "installDir": "${sourceDir}/install/${presetName}",
             "cacheVariables": {
-                "CMAKE_CXX_SCAN_FOR_MODULES": "OFF",
                 "CMAKE_CONFIGURATION_TYPES": "Release;Debug",
-                "CMAKE_DEFAULT_BUILD_TYPE": "Release",
+                "CMAKE_CROSS_CONFIGS": "all",
                 "CMAKE_DEBUG_POSTFIX": "-debug",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_CXX_SCAN_FOR_MODULES": "OFF",
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_C_COMPILER": "gcc"
             },
             "environment": {
                 "CFLAGS": "-Wall -Wextra -Wpedantic -Wunused-parameter -Winit-self -Wcast-align -Wconversion -Wnull-dereference -Wduplicated-cond  -Wsign-conversion -Wlogical-op",
-                "CXXFLAGS": "-Wall -Wextra -Wpedantic -Wunused-parameter -Winit-self -Wcast-align -Wconversion -Wnull-dereference -Wduplicated-cond  -Wsign-conversion -Wlogical-op"
+                "CXXFLAGS": "-Wall -Wextra"
             }
         }
     ],
     "buildPresets": [
         {
-            "name": "testing",
-            "configurePreset": "native",
-            "targets": "logger_ut",
+            "name": "all-debug",
+            "displayName": "all [Debug]",
+            "configurePreset": "gcc-native",
             "configuration": "Debug"
         },
         {
+            "name": "ut",
+            "description": "Unit tests",
+            "configurePreset": "gcc-native",
+            "configuration": "Debug",
+            "targets": "crc_ut"
+        },
+        {
             "name": "install",
-            "configurePreset": "native",
-            "targets": "install"
+            "displayName": "Install",
+            "configurePreset": "gcc-native",
+            "configuration": "Debug",
+            "targets": [
+                "install:Release",
+                "install:Debug"
+            ]
         }
     ],
     "testPresets": [
         {
-            "name": "testing",
-            "configurePreset": "native",
+            "name": "ut",
+            "configurePreset": "gcc-native",
+            "configuration": "Debug",
             "output": {
                 "outputOnFailure": true
             },
@@ -51,6 +59,29 @@
                 "noTestsAction": "error",
                 "stopOnFailure": true
             }
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "default",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "gcc-native"
+                },
+                {
+                    "type": "build",
+                    "name": "all-debug"
+                },
+                {
+                    "type": "test",
+                    "name": "ut"
+                },
+                {
+                    "type": "build",
+                    "name": "install"
+                }
+            ]
         }
     ]
 }

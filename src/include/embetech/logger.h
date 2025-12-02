@@ -1,12 +1,11 @@
-
 /**
-@file
-@purpose   LOGGER Lightweight logging component
-@version   $Revision$
-@license   $License$
-@copyright $Copyright$
-@brief     Logging component
-*/
+ * @file
+ * @license   ${PROJECT_LICENSE}
+ * @copyright ${PROJECT_COPYRIGHT}
+ * @version   ${PROJECT_VERSION}
+ * @purpose   Logger
+ * @brief     Logger API
+ */
 
 #ifndef LOGGER_H_
 #define LOGGER_H_
@@ -42,7 +41,7 @@ extern "C" {
 // The usage of the macros below is similar to cstdio's printf function:
 // The first argument is the format string, the latter arguments should be variables that will be substituted in the format string
 #define LOGGER_DISABLED(...) \
-    LOGGER_PRINT_LINE(LOGGER_LEVEL_DISABLED, __VA_ARGS__) ///< Disables printing message. Useful during development, to leave some test information in code without memory/performnance penalties
+    LOGGER_PRINT_LINE(LOGGER_LEVEL_DISABLED, __VA_ARGS__) ///< Disables printing message. Useful during development, to leave some test information in code without memory/performance penalties
 #define LOGGER_EMERGENCY(...) LOGGER_PRINT_LINE(LOGGER_LEVEL_EMERGENCY, __VA_ARGS__) ///< Prints Emergency message
 #define LOGGER_ALERT(...)     LOGGER_PRINT_LINE(LOGGER_LEVEL_ALERT, __VA_ARGS__)     ///< Prints Alert message
 #define LOGGER_CRITICAL(...)  LOGGER_PRINT_LINE(LOGGER_LEVEL_CRITICAL, __VA_ARGS__)  ///< Prints Critical message
@@ -118,10 +117,10 @@ typedef void (*LOGGER_UnlockFunction)(void* context); ///< Log unlock function t
  * @param[in] lock locking function
  * @param[in] unlock unlocking function
  * @param[in] fContext output function's context
- * @note since LOGGER will not initialize/deinitialze the locking mechanism, it is user responsibility to manage its lifetime
+ * @note since LOGGER will not initialize/deinitialize the locking mechanism, it is user responsibility to manage its lifetime
  * @note lock and unlock function pointer has to be both either null or non-null
  * @note if LOGGER_THREAD_SAFETY_HOOKS is set to 0, the function can be called, but this setting has no effect
- * @retval true when locking mechains has been changed, false if provided arguments are invalid or lock-timeout ocurred
+ * @retval true when locking mechanism has been changed, false if provided arguments are invalid or lock-timeout occurred
  */
 bool LOGGER_SetLockingMechanism(LOGGER_LockFunction lock, LOGGER_UnlockFunction unlock, void* fContext);
 
@@ -303,7 +302,7 @@ void LOGGER_SetSuffix(char const* data, size_t length);
 
 /**
  * @brief Defers macro
- * @param[in] x macro to be defered
+ * @param[in] x macro to be deferred
  */
 #define LOGGER_DEFER(x) LOGGER_EMPTY() x
 
@@ -559,7 +558,7 @@ typedef struct {
 #if 1 == LOGGER_THREAD_SAFETY_HOOKS
 /**
  * @brief Attempts to achieve exclusive access to log output
- * @return true if access was achieved, false otherwise. If user did not set locking mechanisms, will allways return true
+ * @return true if access was achieved, false otherwise. If user did not set locking mechanisms, will always return true
  */
 bool LOGGER_Lock(void);
 
@@ -636,7 +635,7 @@ void LOGGER_PrintHeader(LOGGER_HeaderDescriptor descr);
 
 
 /**
- * @brief Prints header with code location, and formated string, followed by new line character
+ * @brief Prints header with code location, and formatted string, followed by new line character
  * @param[in] descr header descriptor
  * @param[in] format cString containing format description
  * @param[in] ... format arguments

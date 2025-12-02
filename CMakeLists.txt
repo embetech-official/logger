@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(logger VERSION 1.2.5)
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" PROJECT_VERSION)
+
+project(logger VERSION ${PROJECT_VERSION})
 
 include(CMakeDependentOption)
 
@@ -13,7 +15,7 @@ cmake_dependent_option(
 
 option(LOGGER_PTRDIFF_SUPPORT "Enables formatted printing of ptrdiff_t" OFF)
 
-option(LOGGER_TIMESTAMPS "Enables support for timestamping logger messages" ON)
+option(LOGGER_TIMESTAMPS "Enables support for time stamping logger messages" ON)
 
 cmake_dependent_option(
   LOGGER_HUMAN_READABLE_TIMESTAMP "Prints timestamps in human readable format (hh:mm::ss.ms)" OFF
@@ -33,11 +35,11 @@ option(
 )
 
 option(LOGGER_THREAD_SAFETY_HOOKS
-       "Enables LOGGER_SetLockingMechanism funtion that allows setting custom lock mechanism" OFF
+       "Enables LOGGER_SetLockingMechanism function that allows setting custom lock mechanism" OFF
 )
 
 option(LOGGER_FLUSH_HOOKS
-       "Enables LOGGER_SetFlushHook funtion that will be called after each logger message" OFF
+       "Enables LOGGER_SetFlushHook function that will be called after each logger message" OFF
 )
 
 option(LOGGER_VERBOSE_ERRORS
@@ -50,11 +52,13 @@ option(LOGGER_INSTALL "Configure install target" ON)
 
 include(cmake/logger_utils.cmake)
 
+include(cmake/requirements.cmake)
+
 add_subdirectory(src)
 
 if (LOGGER_TESTS)
   include(CTest)
-  add_subdirectory(tests EXCLUDE_FROM_ALL)
+  add_subdirectory(tests)
 endif ()
 
 if (LOGGER_INSTALL)

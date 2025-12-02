@@ -1,0 +1,31 @@
+enabled: true
+readonly: true
+language: en
+caseSensitive: false
+
+useGitignore: false # ensures better compatibility when used in multiple projects
+
+enabledFileTypes:
+- cpp
+- c
+- markdown
+- cmake
+- json
+- yaml
+
+files: /**
+ignorePaths:
+- doc/CMakeLists.txt
+- .clangd
+- .cspell.yaml
+- build/**
+
+words:
+ - embetech
+ - fctprintf
+ - vfctprintf
+ - endforeach
+ - endfunction
+ - endmacro
+ - strequal
+ - TOUPPER
