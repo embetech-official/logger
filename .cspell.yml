@@ -6,21 +6,28 @@ caseSensitive: false
 useGitignore: false # ensures better compatibility when used in multiple projects
 
 enabledFileTypes:
-- cpp
-- c
-- markdown
-- cmake
-- json
-- yaml
+ - cpp
+ - c
+ - markdown
+ - cmake
+ - json
+ - yaml
 
 files: /**
 ignorePaths:
-- doc/CMakeLists.txt
-- .clangd
-- .cspell.yaml
-- build/**
+ - .clangd
+ - .clang-format
+ - .cmake-format
+ - .cspell.yml
+ - build/**
+
+ignoreRegExpList:
+ - /-W(no)*[a-z]+/g # ignore compiler warning flags
+ - /-D[A-Z]+/g # ignore compiler define flags
 
 words:
+ - cpmaddpackage
+ - destdir
  - embetech
  - fctprintf
  - vfctprintf

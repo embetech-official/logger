@@ -1,5 +1,7 @@
  CompileFlags:
-  Add: -ferror-limit=0
+  Add:
+   - -ferror-limit=0
+   - -Wall
 
 ---
 Diagnostics:
