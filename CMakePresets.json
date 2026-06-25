@@ -1,9 +1,10 @@
 {
-    "version": 6,
+    "version": 8,
     "configurePresets": [
         {
-            "name": "gcc-native",
-            "description": "Use any available GNU compiler",
+            "name": "native-gcc",
+            "displayName": "Native GCC Compiler",
+            "description": "First available GCC compiler",
             "generator": "Ninja Multi-Config",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "installDir": "${sourceDir}/install/${presetName}",
@@ -24,23 +25,24 @@
     ],
     "buildPresets": [
         {
-            "name": "all-debug",
+            "name": "native-gcc-all-debug",
             "displayName": "all [Debug]",
-            "configurePreset": "gcc-native",
+            "description": "Build all targets in Debug configuration",
+            "configurePreset": "native-gcc",
             "configuration": "Debug"
         },
         {
-            "name": "ut",
-            "description": "Unit tests",
-            "configurePreset": "gcc-native",
-            "configuration": "Debug",
-            "targets": "crc_ut"
+            "name": "native-gcc-all-release",
+            "displayName": "all [Release]",
+            "description": "Build all targets in Release configuration",
+            "configurePreset": "native-gcc",
+            "configuration": "Release"
         },
         {
-            "name": "install",
-            "displayName": "Install",
-            "configurePreset": "gcc-native",
-            "configuration": "Debug",
+            "name": "native-gcc-install",
+            "displayName": "Install [Debug + Release]",
+            "description": "Install all targets (Release + Debug)",
+            "configurePreset": "native-gcc",
             "targets": [
                 "install:Release",
                 "install:Debug"
@@ -49,8 +51,10 @@
     ],
     "testPresets": [
         {
-            "name": "ut",
-            "configurePreset": "gcc-native",
+            "name": "native-gcc",
+            "displayName": "Run Tests [Debug]",
+            "description": "Run all tests in Debug configuration",
+            "configurePreset": "native-gcc",
             "configuration": "Debug",
             "output": {
                 "outputOnFailure": true
@@ -63,23 +67,25 @@
     ],
     "workflowPresets": [
         {
-            "name": "default",
+            "name": "native-gcc",
+            "displayName": "Native GCC Compiler Workflow",
+            "description": "Configure, Build all [Debug], Run Tests, Install",
             "steps": [
                 {
                     "type": "configure",
-                    "name": "gcc-native"
+                    "name": "native-gcc"
                 },
                 {
                     "type": "build",
-                    "name": "all-debug"
+                    "name": "native-gcc-all-debug"
                 },
                 {
                     "type": "test",
-                    "name": "ut"
+                    "name": "native-gcc"
                 },
                 {
                     "type": "build",
-                    "name": "install"
+                    "name": "native-gcc-install"
                 }
             ]
         }

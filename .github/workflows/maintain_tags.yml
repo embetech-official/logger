@@ -1,17 +1,13 @@
-name: 'Tags'
+name: Maintain Tags
 
 on:
-    release:
-        types: [published]
+  release:
+    types: [published]
 
 jobs:
-    tags:
-        name: 'Tags'
-        runs-on: ubuntu-latest
-        timeout-minutes: 5
-
-        steps:
-            - name: 'Update Tags'
-              uses: cssnr/update-version-tags-action@v1
-              with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
+  tags:
+    name: 🏷️ Update version tags
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔁 Update major/minor version tags
+        uses: cssnr/update-version-tags-action@dc7077eaec04b8fd61f7b7e6d4830564cfd12382 # v2.1.1
