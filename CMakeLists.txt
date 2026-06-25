@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION.txt" PROJECT_VERSION)
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION.txt" PROJECT_VERSION)
 project(logger VERSION ${PROJECT_VERSION})
 
 include(CMakeDependentOption)
