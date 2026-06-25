@@ -1,0 +1,50 @@
+ CompileFlags:
+  Add:
+   - -ferror-limit=0
+   - -Wall
+
+---
+Diagnostics:
+  ClangTidy:
+    Add: "*"
+    Remove:
+      - abseil-*
+      - altera-*
+      - android-*
+      - fuchsia-*
+      - google-*
+      - llvm*
+      - modernize-use-trailing-return-type
+      - zircon-*
+      - readability-else-after-return
+      - readability-static-accessed-through-instance
+      - readability-avoid-const-params-in-decls
+      - misc-non-private-member-variables-in-classes
+      - hicpp*
+      - cppcoreguidelines*
+      - readability-identifier-length
+
+
+---
+If:                              
+  PathExclude: ./.*
+Diagnostics:
+  Suppress: 
+    - invalid_token_after_toplevel_declarator
+    - undeclared_var_use
+    - constexpr_var_requires_const_init
+    - expected_unqualified_id
+
+--- 
+If:                              
+  PathMatch: .*\.h               
+CompileFlags:                     
+    Add: 
+      - -xc
+      - -std=c23
+      - -Wno-empty-translation-unit
+
+    Remove: 
+      - -std=gnu++*
+      - -std=c++*            
+

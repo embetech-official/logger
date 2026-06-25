@@ -1,49 +1,61 @@
 {
-    "version": 6,
-    "cmakeMinimumRequired": {
-        "major": 3,
-        "minor": 20,
-        "patch": 0
-    },
-    "include": [],
+    "version": 8,
     "configurePresets": [
         {
-            "name": "native",
-            "displayName": "Native",
-            "description": "Let CMake choose the compiler",
+            "name": "native-gcc",
+            "displayName": "Native GCC Compiler",
+            "description": "First available GCC compiler",
             "generator": "Ninja Multi-Config",
             "binaryDir": "${sourceDir}/build/${presetName}",
-            "installDir": "${sourceDir}/build/${presetName}/install",
+            "installDir": "${sourceDir}/install/${presetName}",
             "cacheVariables": {
-                "CMAKE_CXX_SCAN_FOR_MODULES": "OFF",
                 "CMAKE_CONFIGURATION_TYPES": "Release;Debug",
-                "CMAKE_DEFAULT_BUILD_TYPE": "Release",
+                "CMAKE_CROSS_CONFIGS": "all",
                 "CMAKE_DEBUG_POSTFIX": "-debug",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_CXX_SCAN_FOR_MODULES": "OFF",
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_C_COMPILER": "gcc"
             },
             "environment": {
                 "CFLAGS": "-Wall -Wextra -Wpedantic -Wunused-parameter -Winit-self -Wcast-align -Wconversion -Wnull-dereference -Wduplicated-cond  -Wsign-conversion -Wlogical-op",
-                "CXXFLAGS": "-Wall -Wextra -Wpedantic -Wunused-parameter -Winit-self -Wcast-align -Wconversion -Wnull-dereference -Wduplicated-cond  -Wsign-conversion -Wlogical-op"
+                "CXXFLAGS": "-Wall -Wextra"
             }
         }
     ],
     "buildPresets": [
         {
-            "name": "testing",
-            "configurePreset": "native",
-            "targets": "logger_ut",
+            "name": "native-gcc-all-debug",
+            "displayName": "all [Debug]",
+            "description": "Build all targets in Debug configuration",
+            "configurePreset": "native-gcc",
             "configuration": "Debug"
         },
         {
-            "name": "install",
-            "configurePreset": "native",
-            "targets": "install"
+            "name": "native-gcc-all-release",
+            "displayName": "all [Release]",
+            "description": "Build all targets in Release configuration",
+            "configurePreset": "native-gcc",
+            "configuration": "Release"
+        },
+        {
+            "name": "native-gcc-install",
+            "displayName": "Install [Debug + Release]",
+            "description": "Install all targets (Release + Debug)",
+            "configurePreset": "native-gcc",
+            "targets": [
+                "install:Release",
+                "install:Debug"
+            ]
         }
     ],
     "testPresets": [
         {
-            "name": "testing",
-            "configurePreset": "native",
+            "name": "native-gcc",
+            "displayName": "Run Tests [Debug]",
+            "description": "Run all tests in Debug configuration",
+            "configurePreset": "native-gcc",
+            "configuration": "Debug",
             "output": {
                 "outputOnFailure": true
             },
@@ -51,6 +63,31 @@
                 "noTestsAction": "error",
                 "stopOnFailure": true
             }
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "native-gcc",
+            "displayName": "Native GCC Compiler Workflow",
+            "description": "Configure, Build all [Debug], Run Tests, Install",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "native-gcc"
+                },
+                {
+                    "type": "build",
+                    "name": "native-gcc-all-debug"
+                },
+                {
+                    "type": "test",
+                    "name": "native-gcc"
+                },
+                {
+                    "type": "build",
+                    "name": "native-gcc-install"
+                }
+            ]
         }
     ]
 }

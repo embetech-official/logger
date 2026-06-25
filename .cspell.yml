@@ -1,0 +1,39 @@
+enabled: true
+readonly: true
+language: en
+caseSensitive: false
+
+useGitignore: false # ensures better compatibility when used in multiple projects
+
+enabledFileTypes:
+ - cpp
+ - c
+ - markdown
+ - cmake
+ - json
+ - yaml
+
+files: /**
+ignorePaths:
+ - .clangd
+ - .clang-format
+ - .cmake-format
+ - .cspell.yml
+ - build/**
+
+ignoreRegExpList:
+ - /-W(no)*[a-z]+/g # ignore compiler warning flags
+ - /-D[A-Z]+/g # ignore compiler define flags
+
+words:
+ - cpmaddpackage
+ - destdir
+ - embetech
+ - fctprintf
+ - vfctprintf
+ - endforeach
+ - endfunction
+ - endmacro
+ - strequal
+ - TOUPPER
+ - endl

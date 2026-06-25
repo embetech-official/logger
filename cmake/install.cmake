@@ -1,27 +1,22 @@
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
-set(CMAKES_EXPORT_DIR cmake/logger)
+set(METADATA_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/logger)
+
+install(TARGETS logger EXPORT logger-targets ARCHIVE FILE_SET HEADERS)
+install(EXPORT logger-targets NAMESPACE embetech:: DESTINATION ${METADATA_DIR})
 
 write_basic_package_version_file(logger-config-version.cmake COMPATIBILITY SameMajorVersion)
 
 configure_package_config_file(
-  ${PROJECT_SOURCE_DIR}/cmake/logger-config.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/logger-config.cmake
-  INSTALL_DESTINATION ${CMAKES_EXPORT_DIR}
+  ${CMAKE_CURRENT_LIST_DIR}/logger-config_template.cmake ${CMAKE_CURRENT_BINARY_DIR}/logger-config.cmake INSTALL_DESTINATION ${METADATA_DIR}
+  NO_CHECK_REQUIRED_COMPONENTS_MACRO
 )
 
-install(TARGETS logger EXPORT logger_targets)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/logger-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/logger-config-version.cmake DESTINATION ${METADATA_DIR})
 
-install(DIRECTORY src/include/embetech DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES ${PROJECT_SOURCE_DIR}/cmake/logger_utils.cmake DESTINATION ${METADATA_DIR})
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/logger-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/logger-config-version.cmake
-        DESTINATION ${CMAKES_EXPORT_DIR}
-)
+install(FILES LICENSE.txt DESTINATION ${METADATA_DIR})
 
-install(FILES ${PROJECT_SOURCE_DIR}/cmake/logger_utils.cmake DESTINATION cmake/logger)
-
-install(
-  EXPORT logger_targets
-  NAMESPACE embetech::
-  DESTINATION ${CMAKES_EXPORT_DIR}
-)
+install(SCRIPT ${CMAKE_CURRENT_LIST_DIR}/install_header_licenses.cmake)

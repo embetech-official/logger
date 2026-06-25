@@ -1,0 +1,54 @@
+name: Generate Artifacts
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  library:
+    name: 📦 Build & Install (${{ matrix.config.architecture }})
+    runs-on: [self-hosted, linux, x64]
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { toolchain: gcc, architecture: x86_64-linux-gnu }
+          - { toolchain: gcc, architecture: x86_64-windows-gnu }
+          - { toolchain: gcc, architecture: aarch64-linux-gnu }
+          - { toolchain: gcc, architecture: aarch32-linux-gnu }
+          - { toolchain: gcc, architecture: thumbv6m-none-eabi }
+          - { toolchain: gcc, architecture: thumbv7em-none-eabi }
+          - { toolchain: gcc, architecture: thumbv7em-none-eabihf }
+          - { toolchain: gcc, architecture: thumbv7m-none-eabi }
+          - { toolchain: gcc, architecture: thumbv8m.base-none-eabi }
+          - { toolchain: gcc, architecture: thumbv8m.main-none-eabihf }
+    env:
+      preset: ${{ matrix.config.toolchain }}-${{ matrix.config.architecture }}
+    steps:
+      - name: 🛠️ Install CMake
+        uses: lukka/get-cmake@591817e96fcad43505fb4eae36172462abb3a42e # v4.3.3
+
+      - name: 📥 Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: 📋 Download multiarch CMake presets
+        uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
+        with:
+          repository: embetech-official/cmake-presets
+          tag: v0.0.1
+          fileName: CMakeUserPresets.json
+
+      - name: 🏗️ Build and install library
+        uses: lukka/run-cmake@5d55ea7949e25f69f0ecb516d8d572297e03a956 # v10.9
+        with:
+          configurePreset: ${{ env.preset }}
+          configurePresetAdditionalArgs: '["-DLOGGER_TESTS=0", "-DLOGGER_DOC=0", "-DLOGGER_EXAMPLES=0"]'
+          buildPreset: ${{ env.preset }}-install
+
+      - name: ⬆️ Upload library install directory
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: liblogger-${{ matrix.config.architecture }}
+          path: |
+            install/${{ env.preset }}/**
+          if-no-files-found: error
