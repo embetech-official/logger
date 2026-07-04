@@ -11,6 +11,7 @@
 #define LOGGER_H_
 
 #if (!defined LOGGER_MAIN_) && __has_include(<logger_config.h>)
+#    warning "logger_config.h is deprecated, use logger_set_max_level in CMake instead"
 #    include <logger_config.h>
 #endif
 

@@ -11,6 +11,9 @@ target_include_directories(logger_test_proxy8 PUBLIC ${LOGGER_INCLUDES} ${CMAKE_
 add_executable(logger_ut08 disabling_channel_at_ct.cpp disabling_logger_at_ct.cpp format_support.cpp)
 target_link_libraries(logger_ut08 PRIVATE logger_test_proxy8 logger_test_common)
 
+logger_set_max_level(logger_ut08 CHANNEL UT_04 CONFIG "Release:DISABLED" "Debug:DISABLED")
+logger_set_max_level(logger_ut08 CHANNEL UT_06 CONFIG "Release:NOTICE" "Debug:NOTICE")
+
 add_dependencies(logger_ut logger_ut08)
 
 gtest_discover_tests(logger_ut08)

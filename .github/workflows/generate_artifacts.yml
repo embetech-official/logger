@@ -7,26 +7,48 @@ on:
 jobs:
   library:
     name: 📦 Build & Install (${{ matrix.config.architecture }})
-    runs-on: [self-hosted, linux, x64]
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         config:
-          - { toolchain: gcc, architecture: x86_64-linux-gnu }
-          - { toolchain: gcc, architecture: x86_64-windows-gnu }
-          - { toolchain: gcc, architecture: aarch64-linux-gnu }
-          - { toolchain: gcc, architecture: aarch32-linux-gnu }
-          - { toolchain: gcc, architecture: thumbv6m-none-eabi }
-          - { toolchain: gcc, architecture: thumbv7em-none-eabi }
-          - { toolchain: gcc, architecture: thumbv7em-none-eabihf }
-          - { toolchain: gcc, architecture: thumbv7m-none-eabi }
-          - { toolchain: gcc, architecture: thumbv8m.base-none-eabi }
+          - { toolchain: gcc, architecture: x86_64-linux-gnu          }
+          - { toolchain: gcc, architecture: x86_64-windows-gnu        }
+          - { toolchain: gcc, architecture: aarch64-linux-gnu         }
+          - { toolchain: gcc, architecture: aarch32-linux-gnu         }
+          - { toolchain: gcc, architecture: thumbv6m-none-eabi        }
+          - { toolchain: gcc, architecture: thumbv7em-none-eabi       }
+          - { toolchain: gcc, architecture: thumbv7em-none-eabihf     }
+          - { toolchain: gcc, architecture: thumbv7m-none-eabi        }
+          - { toolchain: gcc, architecture: thumbv8m.base-none-eabi   }
           - { toolchain: gcc, architecture: thumbv8m.main-none-eabihf }
     env:
       preset: ${{ matrix.config.toolchain }}-${{ matrix.config.architecture }}
     steps:
       - name: 🛠️ Install CMake
         uses: lukka/get-cmake@591817e96fcad43505fb4eae36172462abb3a42e # v4.3.3
+
+      - name: 🔧 Install MinGW toolchain
+        if: matrix.config.architecture == 'x86_64-windows-gnu'
+        run: sudo apt-get install -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64
+
+      - name: 🔧 Install arm-none-linux-gnueabihf toolchain
+        if: >
+          matrix.config.architecture == 'aarch64-linux-gnu' ||
+          matrix.config.architecture == 'aarch32-linux-gnu'
+        run: |
+          curl -Lo /tmp/arm-toolchain.tar.xz \
+            "https://armkeil.blob.core.windows.net/developer/files/downloads/gnu/15.2.rel1/binrel/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-linux-gnueabihf.tar.xz"
+          sudo tar -xf /tmp/arm-toolchain.tar.xz -C /opt
+          echo "/opt/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-linux-gnueabihf/bin" >> $GITHUB_PATH
+
+      - name: 🔧 Install arm-none-eabi toolchain
+        if: startsWith(matrix.config.architecture, 'thumbv')
+        run: |
+          curl -Lo /tmp/arm-toolchain.tar.xz \
+            "https://armkeil.blob.core.windows.net/developer/files/downloads/gnu/15.2.rel1/binrel/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi.tar.xz"
+          sudo tar -xf /tmp/arm-toolchain.tar.xz -C /opt
+          echo "/opt/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/bin" >> $GITHUB_PATH
 
       - name: 📥 Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -49,6 +71,5 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: liblogger-${{ matrix.config.architecture }}
-          path: |
-            install/${{ env.preset }}/**
+          path: install/${{ env.preset }}/**
           if-no-files-found: error

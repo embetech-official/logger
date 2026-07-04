@@ -81,27 +81,7 @@ Logger can control which messages are compiled into your binary. You control thi
 
 ### Verbosity Configuration
 
-Global configuration should be stored in `logger_config.h`. The example below presents all configuration options with their default values:
-
- ```C
-#ifndef LOGGER_CONFIG_H_ // Include guard naming convention is not enforced, but endorsed :)
-#define LOGGER_CONFIG_H_
-
-#define LOGGER_ENABLED 1 ///< Main component On/Off switch. If set to 0, even if every other condition is met, the logger will write nothing.
-
-/********* SPECIFY YOUR OWN CHANNELS BELOW *********/
-
-#define COMPONENT1_LOG_CHANNEL_LEVEL LOGGER_LEVEL_INFO ///< Verbosity setting for channel COMPONENT1
-
-#define COMPONENT2_LOG_CHANNEL_LEVEL LOGGER_LEVEL_WARNING ///< Verbosity setting for channel COMPONENT2
-
-#define APP_LOG_CHANNEL_LEVEL LOGGER_LEVEL_EMERGENCY ///< Verbosity setting for channel APP
-
-#define SANITY_CHECKS_LOG_CHANNEL_LEVEL LOGGER_LEVEL_DISABLED ///< Verbosity setting (a.k.a disabling) of channel SANITY_CHECKS :)
-
-
-#endif // That's all folks
- ```
+Each channel's compiled verbosity (`<CHANNEL>_LOG_CHANNEL_LEVEL`) is set per build configuration from CMake using `logger_set_max_level` — see [CMake Integration](#cmake-integration) below. Alternatively, you may define `<CHANNEL>_LOG_CHANNEL_LEVEL` directly (e.g. via `target_compile_definitions` or a compiler `-D` flag). If you don't specify a verbosity for a channel, it remains disabled.
 
 ### Features Configuration
 
@@ -251,6 +231,32 @@ polo!!
 ### LOGGER_VERBOSE_ERRORS
 
 When a user makes a mistake, preprocessor errors can be hard to parse. If enabled, and your compiler is either Clang or GCC-like, each compile-time error is appended with information indicating which logger channel caused the issue.
+
+## CMake Integration
+
+Set a channel's compiled verbosity per build configuration from CMake:
+
+```cmake
+logger_set_max_level(
+    my_target
+    CHANNEL COMPONENT1
+    CONFIG "Debug:DEBUG" "Release:WARNING"
+)
+```
+
+### LOGGER_DEFAULT_MAX_LEVEL
+
+CMake cache variable, default: `DISABLED`.
+
+Level used for any build configuration that is **not** listed in a `logger_set_max_level()` CONFIG list (e.g. you only specified `Debug`/`Release` but the project — or a multi-config generator — also builds `RelWithDebInfo`/`MinSizeRel`). Without this fallback, such a build configuration would compile with no valid channel level at all.
+
+Set it once to change the fallback for the whole project/CI:
+
+```shell
+cmake -B build -DLOGGER_DEFAULT_MAX_LEVEL=INFO
+```
+
+Must be one of the verbosity levels listed above (`DISABLED`, `EMERGENCY`, `ALERT`, `CRITICAL`, `ERROR`, `WARNING`, `NOTICE`, `INFO`, `VERBOSE`, `DEBUG`, `TRACE`).
 
 ## Usage
 

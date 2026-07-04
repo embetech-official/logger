@@ -1,6 +1,5 @@
 // #define LOGGER_CHANNEL UT_10
 
-
 // #include <cfloat>
 // #include <cinttypes>
 // #include <cstdint>
@@ -23,13 +22,12 @@
 //     EXPECT_TRUE(::LOGGER_IsEnabled());
 
 //     [[maybe_unused]] constexpr static auto
-//         message = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis auctor elementum leo, at pretium orci dignissim vehicula. Suspendisse quis scelerisque dolor, eu vestibulum augue.";
-
+//         message = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis auctor elementum leo, at pretium orci dignissim vehicula.
+//         Suspendisse quis scelerisque dolor, eu vestibulum augue.";
 
 //     LOGGER_NOTICE(message);
 //     EXPECT_EQ(received.str().size(), 0);
 //     clear_output();
-
 
 //     LOGGER_DisableHeader();
 

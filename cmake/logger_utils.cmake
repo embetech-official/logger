@@ -1,6 +1,5 @@
 # ----------------------------------------------------------------------
 # This function sets maximum compiled logger channel levels for given target.
-# You MUST define a valid level for each build configuration used.
 #
 # logger_set_max_level(
 #   target_name
@@ -9,7 +8,18 @@
 # )
 #
 # The logger_level can be one of the following: DISABLED, EMERGENCY, ALERT, CRITICAL, ERROR, WARNING, NOTICE, INFO, VERBOSE, DEBUG, TRACE
+# Build config names in CONFIG are matched case-insensitively against CMAKE_BUILD_TYPE /
+# CMAKE_CONFIGURATION_TYPES.
 # This function may be invoked once per target and channel.
+#
+# LOGGER_DEFAULT_MAX_LEVEL (CMake cache variable, default: DISABLED)
+#   Level used for any build configuration that is NOT listed in CONFIG (e.g. you only listed
+#   Debug/Release but the project also builds RelWithDebInfo/MinSizeRel, or a multi-config
+#   generator enables configurations you did not anticipate). Without this fallback, such a
+#   build configuration would compile with no valid channel level at all.
+#   Set it once for the whole project/CI to change the fallback everywhere, e.g.:
+#     cmake -B build -DLOGGER_DEFAULT_MAX_LEVEL=INFO
+#   Must be one of the logger_level values listed above.
 # ----------------------------------------------------------------------
 function (logger_set_max_level target)
   if (NOT TARGET "${target}")
@@ -26,7 +36,7 @@ function (logger_set_max_level target)
   endif ()
   set(channel ${arg_CHANNEL})
 
-  get_target_property(current ${target} "${channel}_LOG_LEVEL")
+  get_target_property(current ${target} "${channel}_LOG_LEVEL_CONFIGURED")
   if (current)
     message(FATAL_ERROR "Log level for channel ${channel} already set for target ${target}")
   endif ()
@@ -50,6 +60,19 @@ function (logger_set_max_level target)
       "DEBUG"
       "TRACE"
   )
+
+  # Level used for build configurations not covered by CONFIG. Cache variable so
+  # projects can override the fallback globally without changing every call site.
+  set(LOGGER_DEFAULT_MAX_LEVEL
+      "DISABLED"
+      CACHE STRING "Log level used for build configurations missing from a logger_set_max_level() CONFIG list"
+  )
+  set_property(CACHE LOGGER_DEFAULT_MAX_LEVEL PROPERTY STRINGS ${allowed_levels})
+
+  string(TOUPPER "${LOGGER_DEFAULT_MAX_LEVEL}" default_max_level)
+  if (NOT default_max_level IN_LIST allowed_levels)
+    message(FATAL_ERROR "Invalid LOGGER_DEFAULT_MAX_LEVEL: '${LOGGER_DEFAULT_MAX_LEVEL}'")
+  endif ()
 
   get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
   if (is_multi_config)
@@ -78,44 +101,42 @@ function (logger_set_max_level target)
     endif ()
 
     list(GET entry 0 build_type)
+    # Build type names are compared case-insensitively (CMAKE_BUILD_TYPE /
+    # CMAKE_CONFIGURATION_TYPES casing is not guaranteed, e.g. "Debug" vs "debug").
+    string(TOUPPER "${build_type}" build_type_upper)
 
     list(GET entry 1 level)
     string(TOUPPER "${level}" level)
 
-    if (build_type IN_LIST used_build_types)
+    if (build_type_upper IN_LIST used_build_types)
       message(FATAL_ERROR "Duplicate build type: ${build_type} in entry '${entry_str}'")
     endif ()
-    list(APPEND used_build_types ${build_type})
+    list(APPEND used_build_types ${build_type_upper})
 
     if (NOT level IN_LIST allowed_levels)
       message(FATAL_ERROR "Invalid log level: '${level}' in entry '${entry_str}'")
     endif ()
 
-    if (is_multi_config)
-      # All entries are appended as a generator expression
-      set(config_entry "$<$<CONFIG:${build_type}>:${channel}_LOG_CHANNEL_LEVEL=LOGGER_LEVEL_${level}>")
-
-    else ()
-      # Set value only for matching build type
-      if (build_type STREQUAL ${single_build_type})
-        set(config_entry ${channel}_LOG_CHANNEL_LEVEL=LOGGER_LEVEL_${level})
-      endif ()
-    endif ()
-    list(APPEND compile_definitions "${config_entry}")
+    # Each build type gets its own plain (non-generator-expression) target property.
+    # This keeps per-config values individually inspectable/overridable later, and
+    # avoids nesting generator expressions inside a property's stored value, which
+    # $<TARGET_PROPERTY:...> does not expand.
+    set_target_properties(${target} PROPERTIES "${channel}_LOG_LEVEL_${build_type_upper}" "LOGGER_LEVEL_${level}")
   endforeach ()
 
-  # Make sure that ALL of the build types, used in the project are covered
+  # Build types not covered by CONFIG fall back to LOGGER_DEFAULT_MAX_LEVEL instead
+  # of being left without a compiled level.
   foreach (type IN LISTS expected_build_types)
-    if (NOT type IN_LIST used_build_types)
+    string(TOUPPER "${type}" type_upper)
+    if (NOT type_upper IN_LIST used_build_types)
       if (NOT quiet)
-        message(WARNING "Missing log configuration for build type: ${type}")
+        message(WARNING "Missing log configuration for build type: ${type}, using LOGGER_DEFAULT_MAX_LEVEL (${default_max_level})")
       endif ()
+      set_target_properties(${target} PROPERTIES "${channel}_LOG_LEVEL_${type_upper}" "LOGGER_LEVEL_${default_max_level}")
     endif ()
   endforeach ()
 
-  message(DEBUG "compile_definitions for target ${target}: ${compile_definitions}")
-
-  set_target_properties(${target} PROPERTIES "${channel}_LOG_LEVEL" "${compile_definitions}")
+  set_target_properties(${target} PROPERTIES "${channel}_LOG_LEVEL_CONFIGURED" TRUE)
 
   get_target_property(type ${target} TYPE)
   if ("${type}" STREQUAL "INTERFACE_LIBRARY")
@@ -123,6 +144,22 @@ function (logger_set_max_level target)
   else ()
     set(visibility "PRIVATE")
   endif ()
+
+  if (is_multi_config)
+    foreach (type IN LISTS expected_build_types)
+      string(TOUPPER "${type}" type_upper)
+      list(APPEND compile_definitions
+           "$<$<CONFIG:${type}>:${channel}_LOG_CHANNEL_LEVEL=$<TARGET_PROPERTY:${target},${channel}_LOG_LEVEL_${type_upper}>>"
+      )
+    endforeach ()
+  else ()
+    string(TOUPPER "${single_build_type}" single_build_type_upper)
+    list(APPEND compile_definitions
+         "${channel}_LOG_CHANNEL_LEVEL=$<TARGET_PROPERTY:${target},${channel}_LOG_LEVEL_${single_build_type_upper}>"
+    )
+  endif ()
+
+  message(DEBUG "compile_definitions for target ${target}: ${compile_definitions}")
 
   target_compile_definitions(${target} ${visibility} ${compile_definitions})
 
