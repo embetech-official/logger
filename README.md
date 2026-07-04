@@ -252,6 +252,32 @@ polo!!
 
 When a user makes a mistake, preprocessor errors can be hard to parse. If enabled, and your compiler is either Clang or GCC-like, each compile-time error is appended with information indicating which logger channel caused the issue.
 
+## CMake Integration
+
+Instead of hardcoding `*_LOG_CHANNEL_LEVEL` in `logger_config.h`, you can set a channel's compiled verbosity per build configuration from CMake:
+
+```cmake
+logger_set_max_level(
+    my_target
+    CHANNEL COMPONENT1
+    CONFIG "Debug:DEBUG" "Release:WARNING"
+)
+```
+
+### LOGGER_DEFAULT_MAX_LEVEL
+
+CMake cache variable, default: `DISABLED`.
+
+Level used for any build configuration that is **not** listed in a `logger_set_max_level()` CONFIG list (e.g. you only specified `Debug`/`Release` but the project — or a multi-config generator — also builds `RelWithDebInfo`/`MinSizeRel`). Without this fallback, such a build configuration would compile with no valid channel level at all.
+
+Set it once to change the fallback for the whole project/CI:
+
+```shell
+cmake -B build -DLOGGER_DEFAULT_MAX_LEVEL=INFO
+```
+
+Must be one of the verbosity levels listed above (`DISABLED`, `EMERGENCY`, `ALERT`, `CRITICAL`, `ERROR`, `WARNING`, `NOTICE`, `INFO`, `VERBOSE`, `DEBUG`, `TRACE`).
+
 ## Usage
 
 ### Minimal Configuration
