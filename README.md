@@ -81,27 +81,7 @@ Logger can control which messages are compiled into your binary. You control thi
 
 ### Verbosity Configuration
 
-Global configuration should be stored in `logger_config.h`. The example below presents all configuration options with their default values:
-
- ```C
-#ifndef LOGGER_CONFIG_H_ // Include guard naming convention is not enforced, but endorsed :)
-#define LOGGER_CONFIG_H_
-
-#define LOGGER_ENABLED 1 ///< Main component On/Off switch. If set to 0, even if every other condition is met, the logger will write nothing.
-
-/********* SPECIFY YOUR OWN CHANNELS BELOW *********/
-
-#define COMPONENT1_LOG_CHANNEL_LEVEL LOGGER_LEVEL_INFO ///< Verbosity setting for channel COMPONENT1
-
-#define COMPONENT2_LOG_CHANNEL_LEVEL LOGGER_LEVEL_WARNING ///< Verbosity setting for channel COMPONENT2
-
-#define APP_LOG_CHANNEL_LEVEL LOGGER_LEVEL_EMERGENCY ///< Verbosity setting for channel APP
-
-#define SANITY_CHECKS_LOG_CHANNEL_LEVEL LOGGER_LEVEL_DISABLED ///< Verbosity setting (a.k.a disabling) of channel SANITY_CHECKS :)
-
-
-#endif // That's all folks
- ```
+Each channel's compiled verbosity (`<CHANNEL>_LOG_CHANNEL_LEVEL`) is set per build configuration from CMake using `logger_set_max_level` — see [CMake Integration](#cmake-integration) below. Alternatively, you may define `<CHANNEL>_LOG_CHANNEL_LEVEL` directly (e.g. via `target_compile_definitions` or a compiler `-D` flag). If you don't specify a verbosity for a channel, it remains disabled.
 
 ### Features Configuration
 
@@ -254,7 +234,7 @@ When a user makes a mistake, preprocessor errors can be hard to parse. If enable
 
 ## CMake Integration
 
-Instead of hardcoding `*_LOG_CHANNEL_LEVEL` in `logger_config.h`, you can set a channel's compiled verbosity per build configuration from CMake:
+Set a channel's compiled verbosity per build configuration from CMake:
 
 ```cmake
 logger_set_max_level(
