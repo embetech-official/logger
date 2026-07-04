@@ -10,10 +10,6 @@
 #ifndef LOGGER_H_
 #define LOGGER_H_
 
-#if (!defined LOGGER_MAIN_) && __has_include(<logger_config.h>)
-#    include <logger_config.h>
-#endif
-
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
