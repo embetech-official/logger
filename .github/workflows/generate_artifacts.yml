@@ -51,7 +51,7 @@ jobs:
         uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
         with:
           repository: embetech-official/cmake-presets
-          tag: v0.0.1
+          tag: v1.0.0
           fileName: CMakeUserPresets.json
 
       - name: 🏗️ Build and install library
