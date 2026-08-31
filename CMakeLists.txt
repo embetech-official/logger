@@ -32,6 +32,7 @@ option(LOGGER_FLUSH_HOOKS "Enables LOGGER_SetFlushHook function that will be cal
 option(LOGGER_VERBOSE_ERRORS "Uses custom compiler pragmas to display additional debug information on compilation errors" OFF)
 
 option(LOGGER_TESTS "Build test cases" ${PROJECT_IS_TOP_LEVEL})
+option(LOGGER_DOC "Build documentation" ${PROJECT_IS_TOP_LEVEL})
 option(LOGGER_INSTALL "Configure install target" ON)
 
 set(LOGGER_UTILS ${CMAKE_CURRENT_SOURCE_DIR}/cmake/logger_utils.cmake CACHE FILEPATH "Path to logger_utils module")
@@ -41,6 +42,10 @@ include(${LOGGER_UTILS})
 include(cmake/requirements.cmake)
 
 add_subdirectory(src)
+
+if (LOGGER_DOC)
+  add_subdirectory(doc)
+endif ()
 
 if (LOGGER_TESTS)
   include(CTest)

@@ -1,0 +1,94 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      draft:
+        description: 'Create as draft release (review before publishing)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  reuse_compliance:
+    name: 📜 REUSE compliance
+    uses: ./.github/workflows/reuse_compliance.yml
+
+  validate:
+    name: 🔎 Validate version & tag
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: 🔖 Derive tag from VERSION.txt
+        id: version
+        run: |
+          version=$(tr -d '[:space:]' < VERSION.txt)
+          echo "tag=v${version}" >> "$GITHUB_OUTPUT"
+
+      - name: 🚫 Ensure tag does not already exist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/${{ github.repository }}/git/refs/tags/${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
+            echo "::error::Tag ${{ steps.version.outputs.tag }} already exists. Bump VERSION.txt before releasing."
+            exit 1
+          fi
+
+  test:
+    name: 🔨 Build & Test (native GCC)
+    needs: validate
+    uses: ./.github/workflows/on_push.yml
+    secrets: inherit
+
+  build:
+    name: 🏗️ Build artifacts
+    needs: [validate, reuse_compliance]
+    uses: ./.github/workflows/generate_artifacts.yml
+    secrets: inherit
+
+  release:
+    name: 🚀 Create release
+    needs: [validate, test, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: ⬇️ Download build artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          path: artifacts
+
+      - name: 📦 Package archives
+        run: |
+          mkdir -p release-assets
+          for dir in artifacts/liblogger*/; do
+            name=$(basename "$dir")
+            tar czf "release-assets/${name}.tar.gz" -C "$dir" .
+          done
+
+      - name: 🔒 Generate checksums
+        working-directory: release-assets
+        run: sha256sum *.tar.gz > checksums.sha256
+
+      - name: 🚀 Publish release
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
+        with:
+          tag_name: ${{ needs.validate.outputs.tag }}
+          draft: ${{ inputs.draft }}
+          fail_on_unmatched_files: true
+          files: |
+            release-assets/*.tar.gz
+            release-assets/checksums.sha256

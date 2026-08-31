@@ -621,15 +621,12 @@ static struct {
  * @param[in] ... format arguments
  * @warning does not perform sanity checks. Use only in conjunction with LOGGER_Lock LOGGER_SECTION_START
  */
-void LOGGER_CHECK_FORMAT(1, 2) LOGGER_Print(char const* format, ...);
+void LOGGER_Print(char const* format, ...) LOGGER_CHECK_FORMAT(1, 2);
 
 
 /**
  * @brief Prints log header: $TIMESTAMP $CHANNEL ($LEVEL) [FILE:LINE]:
- * @param[in] headerDescr header descriptor
- * @param[in] channelName cString containing channel name
- * @param[in] file cString containing file name
- * @param[in] line line number
+ * @param[in] descr header descriptor
  * @warning does not perform sanity checks. Use only in conjunction with LOGGER_Lock LOGGER_SECTION_START
  */
 void LOGGER_PrintHeader(LOGGER_HeaderDescriptor descr);
@@ -642,7 +639,7 @@ void LOGGER_PrintHeader(LOGGER_HeaderDescriptor descr);
  * @param[in] ... format arguments
  * @note this function actually performs sanity checks. To enable log compile-time optimization, use via LOGGER_PRINT_LINE macro
  */
-void LOGGER_CHECK_FORMAT(2, 3) LOGGER_PrintLine(LOGGER_HeaderDescriptor descr, char const* format, ...);
+void LOGGER_PrintLine(LOGGER_HeaderDescriptor descr, char const* format, ...) LOGGER_CHECK_FORMAT(2, 3);
 
 
 /**

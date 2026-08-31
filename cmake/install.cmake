@@ -20,3 +20,6 @@ install(FILES ${PROJECT_SOURCE_DIR}/cmake/logger_utils.cmake DESTINATION ${METAD
 install(FILES LICENSE.txt DESTINATION ${METADATA_DIR})
 
 install(SCRIPT ${CMAKE_CURRENT_LIST_DIR}/install_header_licenses.cmake)
+
+install(FILES REUSE.toml DESTINATION .)
+install(DIRECTORY LICENSES DESTINATION .)

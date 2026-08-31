@@ -1,0 +1,19 @@
+version = 1
+SPDX-PackageName = "logger"
+SPDX-PackageSupplier = "Jan Macheta"
+SPDX-PackageDownloadLocation = "https://github.com/embetech-official/logger"
+
+[[annotations]]
+path = "**"
+SPDX-FileCopyrightText = "Jan Macheta"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = "cmake/CPM.cmake"
+SPDX-FileCopyrightText = "2019-2023 Lars Melchior and contributors"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = "src/third_party/printf.*"
+SPDX-FileCopyrightText = "2014-2019 Marco Paland (info@paland.com), PALANDesign Hannover, Germany"
+SPDX-License-Identifier = "MIT"
