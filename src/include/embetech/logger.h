@@ -626,6 +626,12 @@ void LOGGER_EndSection(void);
 #define LOGGER_SECTION_ENDL() LOGGER_SECTION_END()
 #endif
 
+/**
+ * @brief Get library version as a NUL-terminated string.
+ * @return Pointer to a read-only, statically-allocated string in semantic version format (e.g., "1.2.3"). Must not be freed or modified.
+ */
+char const *LOGGER_GetVersionString(void);
+
 #ifdef __cplusplus
 }
 #endif

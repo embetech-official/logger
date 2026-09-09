@@ -4,7 +4,7 @@ target_compile_features(logger PUBLIC c_std_99)
 
 target_sources(
   logger
-  PRIVATE logger.c third_party/printf.c
+  PRIVATE logger.c logger_version.c third_party/printf.c
   PUBLIC FILE_SET HEADERS BASE_DIRS include FILES include/embetech/logger.h
   PRIVATE FILE_SET
           private_headers
@@ -42,3 +42,8 @@ target_compile_definitions(
          LOGGER_HEADER_WITH_LOCATION=$<BOOL:${LOGGER_HEADER_WITH_LOCATION}> LOGGER_THREAD_SAFETY_HOOKS=$<BOOL:${LOGGER_THREAD_SAFETY_HOOKS}>
          LOGGER_FLUSH_HOOKS=$<BOOL:${LOGGER_FLUSH_HOOKS}> LOGGER_VERBOSE_ERRORS=$<BOOL:${LOGGER_VERBOSE_ERRORS}>
 )
+
+include(${PROJECT_SOURCE_DIR}/cmake/versioning.cmake)
+get_version_string(LOGGER_VERSION_STRING VERSION ${PROJECT_VERSION})
+
+target_compile_definitions(logger PRIVATE LOGGER_VERSION="${LOGGER_VERSION_STRING}")
