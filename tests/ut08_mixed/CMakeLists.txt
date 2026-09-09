@@ -7,6 +7,7 @@ list(TRANSFORM LOGGER_SOURCES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 
 add_library(logger_test_proxy8 ${LOGGER_SOURCES})
 target_include_directories(logger_test_proxy8 PUBLIC ${LOGGER_INCLUDES} ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_definitions(logger_test_proxy8 PRIVATE LOGGER_VERSION="${LOGGER_VERSION_STRING}")
 
 add_executable(logger_ut08 disabling_channel_at_ct.cpp disabling_logger_at_ct.cpp format_support.cpp)
 target_link_libraries(logger_ut08 PRIVATE logger_test_proxy8 logger_test_common)

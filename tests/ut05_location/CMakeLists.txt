@@ -7,6 +7,7 @@ list(TRANSFORM LOGGER_SOURCES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 
 add_library(logger_test_proxy5_1 ${LOGGER_SOURCES})
 target_include_directories(logger_test_proxy5_1 PUBLIC ${LOGGER_INCLUDES})
+target_compile_definitions(logger_test_proxy5_1 PRIVATE LOGGER_VERSION="${LOGGER_VERSION_STRING}")
 target_compile_definitions(logger_test_proxy5_1 PUBLIC LOGGER_HEADER_WITH_LOCATION=1 LOGGER_FILE="OVERRIDDEN")
 
 add_executable(logger_ut05_1 ut05_1_location.c ut05_1_location.cpp)
@@ -14,6 +15,7 @@ target_link_libraries(logger_ut05_1 PRIVATE logger_test_proxy5_1 logger_test_com
 
 add_library(logger_test_proxy5_2 ${LOGGER_SOURCES})
 target_include_directories(logger_test_proxy5_2 PUBLIC ${LOGGER_INCLUDES})
+target_compile_definitions(logger_test_proxy5_2 PRIVATE LOGGER_VERSION="${LOGGER_VERSION_STRING}")
 target_compile_definitions(logger_test_proxy5_2 PUBLIC LOGGER_HEADER_WITH_LOCATION=1 LOGGER_TIMESTAMPS=1 LOGGER_FILE="OVERRIDDEN")
 
 add_executable(logger_ut05_2 ut05_2_location_timestamp.cpp)
@@ -21,6 +23,7 @@ target_link_libraries(logger_ut05_2 PRIVATE logger_test_proxy5_2 logger_test_com
 
 add_library(logger_test_proxy5_3 ${LOGGER_SOURCES})
 target_include_directories(logger_test_proxy5_3 PUBLIC ${LOGGER_INCLUDES})
+target_compile_definitions(logger_test_proxy5_3 PRIVATE LOGGER_VERSION="${LOGGER_VERSION_STRING}")
 target_compile_definitions(
   logger_test_proxy5_3 PUBLIC LOGGER_HEADER_WITH_LOCATION=1 LOGGER_TIMESTAMPS=1 LOGGER_CUSTOM_AFFIXES=1 LOGGER_FILE="OVERRIDDEN"
 )

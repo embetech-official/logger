@@ -45,5 +45,6 @@ target_compile_definitions(
 
 include(${PROJECT_SOURCE_DIR}/cmake/versioning.cmake)
 get_version_string(LOGGER_VERSION_STRING VERSION ${PROJECT_VERSION})
+set(LOGGER_VERSION_STRING ${LOGGER_VERSION_STRING} CACHE INTERNAL "Version string embedded via LOGGER_VERSION")
 
 target_compile_definitions(logger PRIVATE LOGGER_VERSION="${LOGGER_VERSION_STRING}")
