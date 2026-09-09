@@ -1,0 +1,35 @@
+name: Sync version tags
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to sync major/minor tags to'
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      tag:
+        description: 'Tag to sync major/minor tags to'
+        required: true
+        type: string
+
+concurrency:
+  group: sync-version-tags
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync_version_tags:
+    name: 🏷️ Sync version tags
+    runs-on: [self-hosted, linux, x64]
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: 🔁 Update major/minor version tags
+        uses: cssnr/update-version-tags-action@dc7077eaec04b8fd61f7b7e6d4830564cfd12382 # v2.1.1
+        with:
+          tag: ${{ inputs.tag }}

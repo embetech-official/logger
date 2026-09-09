@@ -8,17 +8,33 @@ on:
         type: boolean
         default: false
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: read
+  pull-requests: write
+  actions: write
 
 jobs:
   reuse_compliance:
     name: 📜 REUSE compliance
-    uses: ./.github/workflows/reuse_compliance.yml
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: 📜 REUSE compliance
+        uses: ./.github/actions/reuse-compliance
 
   validate:
     name: 🔎 Validate version & tag
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       tag: ${{ steps.version.outputs.tag }}
     steps:
@@ -42,22 +58,23 @@ jobs:
             exit 1
           fi
 
-  test:
-    name: 🔨 Build & Test (native GCC)
+  run_test_suite:
+    name: 🧪 Run test suite
     needs: validate
-    uses: ./.github/workflows/on_push.yml
+    uses: ./.github/workflows/run_test_suite.yml
     secrets: inherit
 
   build:
     name: 🏗️ Build artifacts
-    needs: [validate, reuse_compliance]
+    needs: [validate, run_test_suite]
     uses: ./.github/workflows/generate_artifacts.yml
     secrets: inherit
 
   release:
     name: 🚀 Create release
-    needs: [validate, test, build]
+    needs: [validate, reuse_compliance, build]
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: write
     steps:
@@ -66,22 +83,17 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: ⬇️ Download build artifacts
+      - name: ⬇️ Download release assets
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          path: artifacts
-
-      - name: 📦 Package archives
-        run: |
-          mkdir -p release-assets
-          for dir in artifacts/liblogger*/; do
-            name=$(basename "$dir")
-            tar czf "release-assets/${name}.tar.gz" -C "$dir" .
-          done
+          pattern: logger-*
+          path: release-assets
+          merge-multiple: true
+          skip-decompress: true
 
       - name: 🔒 Generate checksums
         working-directory: release-assets
-        run: sha256sum *.tar.gz > checksums.sha256
+        run: sha256sum *.zip > checksums.sha256
 
       - name: 🚀 Publish release
         uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
@@ -90,5 +102,16 @@ jobs:
           draft: ${{ inputs.draft }}
           fail_on_unmatched_files: true
           files: |
-            release-assets/*.tar.gz
+            release-assets/*.zip
             release-assets/checksums.sha256
+
+  sync_version_tags:
+    name: 🏷️ Sync version tags
+    needs: [validate, release]
+    if: ${{ !inputs.draft }}
+    permissions:
+      contents: write
+    uses: ./.github/workflows/sync_version_tags.yml
+    with:
+      tag: ${{ needs.validate.outputs.tag }}
+    secrets: inherit

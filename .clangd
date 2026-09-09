@@ -1,50 +1,170 @@
- CompileFlags:
+# =============================================================================
+# General ruleset
+# =============================================================================
+CompileFlags:
   Add:
    - -ferror-limit=0
    - -Wall
+   # CMake omits -std whenever the compiler's default already satisfies the target's requested
+   # standard, so compile_commands.json carries no -std for cxx_std_20 targets under GCC 16.
+   # clang defaults to C++17 and would then reject C++20 code, hence this floor. It is the highest
+   # standard used anywhere in these repos, so it never lowers a target - but it also won't catch
+   # a C++23 construct slipped into a cxx_std_20 target; the build still will.
+   - -std=c++23
 
----
+Index:
+  Background: Build
+
+InlayHints:
+  ParameterNames: true
+  DeducedTypes: true
+
 Diagnostics:
+  UnusedIncludes: Strict
+  MissingIncludes: None
   ClangTidy:
     Add: "*"
     Remove:
-      - abseil-*
-      - altera-*
-      - android-*
-      - fuchsia-*
-      - google-*
-      - llvm*
-      - modernize-use-trailing-return-type
-      - zircon-*
-      - readability-else-after-return
-      - readability-static-accessed-through-instance
-      - readability-avoid-const-params-in-decls
-      - misc-non-private-member-variables-in-classes
-      - hicpp*
-      - cppcoreguidelines*
-      - readability-identifier-length
+      - abseil-*                                                   # Google Abseil library conventions - we don't use Abseil
+      - boost-*                                                    # Boost conventions - we don't use Boost
+      - altera-*                                                   # FPGA/Altera-specific checks - not applicable to this project
+      - android-*                                                  # Android platform conventions - not applicable to this project
+      - fuchsia-*                                                  # Fuchsia OS style guide - not our coding style
+      - google-*                                                   # Google C++ style guide - not our coding style
+      - llvm*                                                      # LLVM coding style - not our coding style
+      - zircon-*                                                   # Zircon kernel checks - not applicable to this project
+      - cppcoreguidelines-avoid-magic-numbers                      # Alias of readability-magic-numbers
+      - modernize-use-trailing-return-type                         # Not a requirement - use when convenient
+      - misc-non-private-member-variables-in-classes               # We use public/protected data members deliberately (structs, PIMPL)
+      - cppcoreguidelines-non-private-member-variables-in-classes  # We use public/protected data members deliberately (structs, PIMPL)
+      - cppcoreguidelines-owning-memory                            # Would push raw owning pointers toward gsl::owner<T>
+      - cppcoreguidelines-pro-bounds-array-to-pointer-decay        # Would push array access toward gsl::span
+      - cppcoreguidelines-pro-bounds-constant-array-index          # Would push array indexing toward gsl::at
+      - cppcoreguidelines-pro-bounds-pointer-arithmetic            # Would push pointer arithmetic toward gsl::span
+      - cppcoreguidelines-pro-type-union-access                     # Unions are how wire formats and register overlays are expressed here
+      - hicpp-no-array-decay                                       # Alias of the array-to-pointer-decay check above
+      - bugprone-unchecked-optional-access                         # Use has_value() before accessing, as value() may throw
+      - clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling # Wants the Annex K *_s functions, which our toolchains don't ship
+      - misc-include-cleaner                                       # Duplicates (and contradicts) Diagnostics.MissingIncludes: None above
+
+    CheckOptions:     
+      readability-magic-numbers.IgnoreBitFieldsWidths: true
+      readability-magic-numbers.IgnoreTypeAliases: true
+      readability-magic-numbers.IgnoreUserDefinedLiterals: true
+      readability-magic-numbers.IgnoredIntegerValues: "0;1;2;3;4;8;16;32;64;128;255;256;512;1024;2048;4096;8192;16384;32768;65535;65536"
+      readability-magic-numbers.IgnoredFloatingPointValues: "0.0;1.0;0.5;100.0"
+
+      readability-braces-around-statements.ShortStatementLines: 0
+      readability-function-cognitive-complexity.Threshold: 30
+
+      readability-implicit-bool-conversion.UseUpperCaseLiteralSuffix: true
+      # AllowLogicalOperatorConversion is not a real option of this check - the two below are.
+      readability-implicit-bool-conversion.AllowIntegerConditions: true
+      readability-implicit-bool-conversion.AllowPointerConditions: true
+
+      # Identifier naming Rules: lower_case by default. UPPER_CASE reserved for macros. CamelCase for Template parameters.
+      # These are our DEFAULTS, not absolutes - deviating is fine where there's a good reason (e.g.
+      # mirroring an external API's exact names, like a vendor DLL's exported symbols).
+      
+      readability-identifier-length.MinimumVariableNameLength: 3
+      readability-identifier-length.MinimumParameterNameLength: 3
+      readability-identifier-length.MinimumLoopCounterNameLength: 1
+      readability-identifier-length.IgnoredVariableNames: "^(ec|id|ip|ok)$"
+      readability-identifier-length.IgnoredParameterNames: "^(ec|id|ip|ok)$"
+
+      readability-identifier-naming.DefaultCase: lower_case
+      readability-identifier-naming.MacroDefinitionCase: UPPER_CASE
+      readability-identifier-naming.EnumConstantCase: UPPER_CASE
+      readability-identifier-naming.ScopedEnumConstantCase: lower_case
+      readability-identifier-naming.EnumCase: CamelCase
+      readability-identifier-naming.ClassCase: CamelCase
+      readability-identifier-naming.StructCase: CamelCase
+      readability-identifier-naming.UnionCase: CamelCase
+      readability-identifier-naming.TemplateParameterCase: CamelCase
+      readability-identifier-naming.TypeAliasCase: CamelCase
+      readability-identifier-naming.TypedefCase: CamelCase
 
 
----
-If:                              
-  PathExclude: ./.*
-Diagnostics:
-  Suppress: 
+  # Parser-level diagnostics that fire on files parsed without a matching
+  # compile-database entry (e.g. standalone-opened headers), not real errors
+  # in our sources.
+  Suppress:
     - invalid_token_after_toplevel_declarator
     - undeclared_var_use
     - constexpr_var_requires_const_init
     - expected_unqualified_id
 
---- 
-If:                              
-  PathMatch: .*\.h               
-CompileFlags:                     
-    Add: 
-      - -xc
-      - -std=c23
-      - -Wno-empty-translation-unit
+---
+# =============================================================================
+# C ruleset
+# =============================================================================
+If:
+  PathMatch:
+    - .*\.c$
+    - .*\.h$
+CompileFlags:
+  Add:
+   - -xc
+   - -std=c23
+   - -Wno-empty-translation-unit
+  Remove:
+   - -std=gnu++*
+   - -std=c++*
+Diagnostics:
+  ClangTidy:
+    Remove:
+      - cppcoreguidelines-* # C++-only check family - meaningless on C sources
+      - hicpp-*             # C++-only check family - meaningless on C sources
+      - modernize-*         # C++-only check family - meaningless on C sources
+      - readability-implicit-bool-conversion # In C every 'bool' in && / || / ?: counts as bool->int; the suggested (int) casts only add noise
+    CheckOptions:
+      readability-identifier-naming.FunctionIgnoredRegexp: "^([A-Z][A-Z0-9]*_)+[A-Z][a-zA-Z0-9]*$"
+      # Our C style is PREFIX_CamelCase for module-scoped names, plus the usual <name>_t for typedefs.
+      readability-identifier-naming.TypedefIgnoredRegexp: "^(([A-Z][A-Z0-9]*_)+[A-Z][a-zA-Z0-9]*|[a-zA-Z][a-zA-Z0-9]*_[tT])$"
+      readability-identifier-naming.EnumConstantIgnoredRegexp: "^([A-Z][A-Z0-9]*_)+[A-Z][a-zA-Z0-9]*$"
+      readability-identifier-naming.GlobalVariableIgnoredRegexp: "^([A-Z][A-Z0-9]*_)+[A-Z][a-zA-Z0-9]*$"
 
-    Remove: 
-      - -std=gnu++*
-      - -std=c++*            
+---
+# =============================================================================
+# External dependencies ruleset (C and C++)
+# =============================================================================
+If:
+  PathMatch:
+    - .*/\.cpm-cache/.*
+    - .*/build/[^/]+/_deps/.*
+    - .*/libs/.*
+Diagnostics:
+  ClangTidy:
+    Remove:
+      # Skip styling - not our code
+      - readability-*
+      - modernize-*
+      - cppcoreguidelines-* 
+      - hicpp-*
+      - misc-*
+      - performance-*
+      - portability-*
 
+---
+# =============================================================================
+# Tests & examples
+# =============================================================================
+If:
+  PathMatch:
+    - .*tests/.*
+    - .*examples/.*
+Diagnostics:
+  ClangTidy:
+    Remove:
+      - cert-*                                             # C secure-coding rules - not applicable to test/demo code
+      - readability-magic-numbers                          # Literal expected values are the point of a test
+      - cppcoreguidelines-avoid-non-const-global-variables # Test fixtures are commonly non-const globals
+      - bugprone-easily-swappable-parameters               # Tests routinely call helpers with several same-typed args
+      - readability-function-cognitive-complexity           # A TEST body is a long, straight-line list of assertions - the metric says nothing here
+      - readability-identifier-length                       # lhs/rhs/v/h1 are the conventional names in a test body
+      - misc-use-internal-linkage                          # A test file is a single TU - plain 'static' helpers are fine
+      - misc-use-anonymous-namespace                        # Same: no need to wrap TU-local test helpers in a namespace
+      - '*avoid-c-arrays'                                  # Exercising a C API means declaring C arrays
+      - cppcoreguidelines-pro-type-reinterpret-cast        # Laying a packet struct over a byte buffer is the point of a wire-format test
+      - cppcoreguidelines-pro-type-static-cast-downcast    # Recovering the fixture from a C callback's base pointer is the same idiom
+      - '*-vararg'                                         # Exercising printf-style C APIs (LOGGER_*, printf) means calling varargs

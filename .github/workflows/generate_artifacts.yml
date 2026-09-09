@@ -10,6 +10,7 @@ concurrency:
 
 permissions:
   contents: read
+  actions: write
 
 jobs:
   library:
@@ -19,33 +20,39 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { architecture: x86_64-linux-gnu,          gcc_toolchain: x86_64-gcc,              vendor: ""    }
-          - { architecture: x86_64-windows-gnu,        gcc_toolchain: x86_64-w64-mingw32-gcc,   vendor: ""    }
-          - { architecture: aarch64-linux-gnu,         gcc_toolchain: aarch64-none-linux-gnu,   vendor: ""    }
-          - { architecture: aarch32-linux-gnu,         gcc_toolchain: arm-none-linux-gnueabihf, vendor: ""    }
-          - { architecture: thumbv6m-none-eabi,        gcc_toolchain: arm-none-eabi,            vendor: "arm" }
-          - { architecture: thumbv7em-none-eabi,       gcc_toolchain: arm-none-eabi,            vendor: "arm" }
-          - { architecture: thumbv7em-none-eabihf,     gcc_toolchain: arm-none-eabi,            vendor: "arm" }
-          - { architecture: thumbv7m-none-eabi,        gcc_toolchain: arm-none-eabi,            vendor: "arm" }
-          - { architecture: thumbv8m.base-none-eabi,   gcc_toolchain: arm-none-eabi,            vendor: "arm" }
-          - { architecture: thumbv8m.main-none-eabihf, gcc_toolchain: arm-none-eabi,            vendor: "arm" }
+          - { architecture: x86_64-linux-gnu,          toolchain: x86_64-gcc,               vendor: ""    }
+          - { architecture: x86_64-windows-gnu,        toolchain: x86_64-w64-mingw32-gcc,    vendor: ""    }
+          - { architecture: aarch64-linux-gnu,         toolchain: aarch64-none-linux-gnu,    vendor: ""    }
+          - { architecture: aarch32-linux-gnu,         toolchain: arm-none-linux-gnueabihf,  vendor: ""    }
+          - { architecture: thumbv6m-none-eabi,        toolchain: arm-none-eabi,             vendor: "arm" }
+          - { architecture: thumbv7em-none-eabi,       toolchain: arm-none-eabi,             vendor: "arm" }
+          - { architecture: thumbv7em-none-eabihf,     toolchain: arm-none-eabi,             vendor: "arm" }
+          - { architecture: thumbv7m-none-eabi,        toolchain: arm-none-eabi,             vendor: "arm" }
+          - { architecture: thumbv8m.base-none-eabi,   toolchain: arm-none-eabi,             vendor: "arm" }
+          - { architecture: thumbv8m.main-none-eabihf, toolchain: arm-none-eabi,             vendor: "arm" }
     env:
       preset: gcc-${{ matrix.config.architecture }}
+      # Only the x86_64-linux-gnu leg also builds docs (see below) - piggy-backed on its install
+      # instead of a separate job/configure, since doxygen writes straight into that same install tree.
+      doc: ${{ matrix.config.architecture == 'x86_64-linux-gnu' && '1' || '0' }}
     steps:
-      - name: 🛠️ Install CMake
-        uses: lukka/get-cmake@591817e96fcad43505fb4eae36172462abb3a42e # v4.3.3
-
-      - name: 🔧 Setup GCC toolchain (${{ matrix.config.gcc_toolchain }})
-        uses: jmacheta/setup-gcc-toolchain@6c712f09af5efb677bc53e4dea195c60b66286e4 # v2.0.1
-        with:
-          toolchain: ${{ matrix.config.gcc_toolchain }}
-          vendor: ${{ matrix.config.vendor }}
-          version: latest
-
       - name: 📥 Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
+
+      - name: 🛠️ Install CMake
+        uses: lukka/get-cmake@591817e96fcad43505fb4eae36172462abb3a42e # v4.3.3
+
+      - name: 📚 Install Doxygen
+        uses: ssciwr/doxygen-install@329d88f5a303066a5bd006db7516b1925b86350e # v2.0.1
+
+      - name: 🔧 Setup GCC toolchain (${{ matrix.config.toolchain }})
+        uses: jmacheta/setup-gcc-toolchain@7aad7bd3b57f5a236de0ea43b232d19f644fb5c4 # v2.1.1
+        with:
+          toolchain: ${{ matrix.config.toolchain }}
+          vendor: ${{ matrix.config.vendor }}
+          version: latest
 
       - name: 📋 Download multiarch CMake presets
         uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
@@ -58,8 +65,13 @@ jobs:
         uses: lukka/run-cmake@5d55ea7949e25f69f0ecb516d8d572297e03a956 # v10.9
         with:
           configurePreset: ${{ env.preset }}
-          configurePresetAdditionalArgs: '["-DLOGGER_TESTS=0", "-DLOGGER_DOC=0", "-DLOGGER_EXAMPLES=0"]'
+          configurePresetAdditionalArgs: >-
+            ["-DLOGGER_TESTS=0", "-DLOGGER_DOC=${{ env.doc }}"]
           buildPreset: ${{ env.preset }}-install
+
+      - name: 📚 Generate documentation
+        if: env.doc == '1'
+        run: cmake --build build/${{ env.preset }} --target logger_doc:Release
 
       - name: ⬆️ Upload library install directory
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -67,35 +79,58 @@ jobs:
           name: liblogger-${{ matrix.config.architecture }}
           path: install/${{ env.preset }}/**
           if-no-files-found: error
+          retention-days: 1
 
-  documentation:
-    name: 📚 Build documentation
+  package-core:
+    name: 📦 Package combined archive
+    needs: library
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
 
-      - name: 📚 Install Doxygen
-        uses: ssciwr/doxygen-install@329d88f5a303066a5bd006db7516b1925b86350e # v2.0.1
+      - name: 🔖 Read version
+        id: version
+        run: echo "version=$(tr -d '[:space:]' < VERSION.txt)" >> "$GITHUB_OUTPUT"
 
-      - name: 🔧 Setup GCC toolchain
-        uses: jmacheta/setup-gcc-toolchain@6c712f09af5efb677bc53e4dea195c60b66286e4 # v2.0.1
+      - name: ⬇️ Download and merge per-architecture install directories
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          toolchain: x86_64-gcc
-          version: latest
+          pattern: liblogger-*
+          path: package/logger-${{ steps.version.outputs.version }}
+          merge-multiple: true
 
-      - name: 📚 Generate documentation
-        uses: lukka/run-cmake@5d55ea7949e25f69f0ecb516d8d572297e03a956 # v10.9
-        with:
-          configurePreset: native-gcc
-          configurePresetAdditionalArgs: '["-DLOGGER_TESTS=0", "-DLOGGER_DOC=1"]'
-          buildPreset: native-gcc-all-release
+      - name: 🧹 Drop Debug-config files (Release-only package)
+        run: |
+          find "package/logger-${{ steps.version.outputs.version }}" -name '*-debug.a' -delete
+          find "package/logger-${{ steps.version.outputs.version }}" -name '*-targets-debug.cmake' -delete
 
-      - name: ⬆️ Upload documentation
+      - name: ⬆️ Upload combined package
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: liblogger-docs
-          path: install/native-gcc/doc/**
+          name: logger-${{ steps.version.outputs.version }}
+          path: package/**
           if-no-files-found: error
+          retention-days: 1
+
+  cleanup:
+    name: 🧹 Remove per-architecture intermediates
+    needs: package-core
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: 🧹 Delete per-architecture artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" --paginate \
+            --jq '.artifacts[] | select(.name | startswith("liblogger-")) | .id' |
+          while read -r id; do
+            gh api -X DELETE "repos/${{ github.repository }}/actions/artifacts/$id"
+          done

@@ -19,7 +19,9 @@ markup:
   literal_comment_pattern: null
   fence_pattern: "^\\s*([`~]{3}[`~]*)(.*)$"
   ruler_pattern: "^\\s*[^\\w\\s]{3}.*[^\\w\\s]{3}$"
-  enable_markup: true
+  # Comment text is left exactly as written - reflowing it to line_width mangles hand-wrapped
+  # explanations and ASCII banners.
+  enable_markup: false
 
 parse:
   additional_commands:
@@ -29,6 +31,9 @@ parse:
       kwargs:
         CHANNEL: 1
         CONFIG: "*"
+    cpmgetpackageversion:
+      spelling: CPMGetPackageVersion
+      pargs: 2
     cpmaddpackage:
       pargs:
         nargs: '*'

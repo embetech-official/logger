@@ -1,0 +1,7 @@
+name: REUSE compliance
+description: Checks the repository for REUSE (licensing/copyright header) compliance. Assumes the repository is already checked out.
+runs:
+  using: composite
+  steps:
+    - name: 🔎 Check REUSE compliance
+      uses: fsfe/reuse-action@9a55738c6490d015afe69ad187520395d2b7a1fa # v6.0.0

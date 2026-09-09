@@ -10,7 +10,7 @@ TEST(LOGGER, UT05_CodeLocationWithPrefixAndTimestamp) {
     received.clear();
   };
 
-  ::LOGGER_SetOutput([](char c, void *context) { *reinterpret_cast<decltype(received) *>(context) << c; }, &received);
+  ::LOGGER_SetOutput([](char c, void *context) { *static_cast<decltype(received) *>(context) << c; }, &received);
   EXPECT_TRUE(::LOGGER_Enable());
   EXPECT_TRUE(::LOGGER_IsEnabled());
   ::LOGGER_SetPrefix("prefix", 6U);
@@ -19,7 +19,7 @@ TEST(LOGGER, UT05_CodeLocationWithPrefixAndTimestamp) {
   char const *const msg = "test message";
   {
 #line 1
-    char const *const expected = "prefix0 DEFAULT (N) [OVERRIDEN:2]: test message\nsuffix";
+    char const *const expected = "prefix0 DEFAULT (N) [OVERRIDDEN:2]: test message\nsuffix";
     LOGGER_NOTICE(msg);
     EXPECT_EQ(expected, received.str());
     clear_output();

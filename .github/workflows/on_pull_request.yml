@@ -1,21 +1,25 @@
-name: SPDX / REUSE Compliance
+name: Pull Request
 
 on:
-  workflow_dispatch:
-  workflow_call:
   pull_request:
     branches: [main]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: pull-request-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
+  run_test_suite:
+    name: 🧪 Run test suite
+    uses: ./.github/workflows/run_test_suite.yml
+    secrets: inherit
+
   reuse_compliance:
-    name: 📜 Check REUSE compliance
+    name: 📜 REUSE compliance
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
@@ -23,5 +27,5 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: 🔎 Check REUSE compliance
-        uses: fsfe/reuse-action@9a55738c6490d015afe69ad187520395d2b7a1fa # v6.0.0
+      - name: 📜 REUSE compliance
+        uses: ./.github/actions/reuse-compliance

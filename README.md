@@ -1,6 +1,7 @@
 # LOGGER — Lightweight, Portable, Formatted Logging Component
 
-[![Unit Tests](https://github.com/embetech-official/logger/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/embetech-official/logger/actions/workflows/unit_tests.yml)
+[![Weekly](https://github.com/embetech-official/logger/actions/workflows/weekly.yml/badge.svg)](https://github.com/embetech-official/logger/actions/workflows/weekly.yml)
+[![Monthly](https://github.com/embetech-official/logger/actions/workflows/monthly.yml/badge.svg)](https://github.com/embetech-official/logger/actions/workflows/monthly.yml)
 ![GitHub License](https://img.shields.io/github/license/embetech-official/logger)
 ![GitHub Release](https://img.shields.io/github/v/release/embetech-official/logger)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/60b12b600a6842f8bf1e81a29c2ad4fe)](https://app.codacy.com/gh/embetech-official/logger/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)

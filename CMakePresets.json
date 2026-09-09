@@ -21,6 +21,39 @@
                 "CFLAGS": "-Wall -Wextra -Wpedantic -Wunused-parameter -Winit-self -Wcast-align -Wconversion -Wnull-dereference -Wduplicated-cond  -Wsign-conversion -Wlogical-op",
                 "CXXFLAGS": "-Wall -Wextra"
             }
+        },
+        {
+            "name": "native-gcc-asan",
+            "displayName": "[Sanitize] Native GCC (ASan+UBSan)",
+            "description": "Native GCC build instrumented with AddressSanitizer and UndefinedBehaviorSanitizer, for tests",
+            "inherits": "native-gcc",
+            "cacheVariables": {
+                "CMAKE_C_FLAGS": "-fsanitize=address,undefined -fno-sanitize-recover=all -g -O1",
+                "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fno-sanitize-recover=all -g -O1",
+                "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,undefined"
+            }
+        },
+        {
+            "name": "native-gcc-tsan",
+            "displayName": "[Sanitize] Native GCC (TSan)",
+            "description": "Native build instrumented with ThreadSanitizer, for tests",
+            "inherits": "native-gcc",
+            "cacheVariables": {
+                "CMAKE_C_FLAGS": "-fsanitize=thread -fno-sanitize-recover=all -g -O1",
+                "CMAKE_CXX_FLAGS": "-fsanitize=thread -fno-sanitize-recover=all -g -O1",
+                "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=thread"
+            }
+        },
+        {
+            "name": "native-gcc-coverage",
+            "displayName": "[Coverage] Native GCC (gcov)",
+            "description": "Native build instrumented with gcov, for test coverage reports",
+            "inherits": "native-gcc",
+            "cacheVariables": {
+                "CMAKE_C_FLAGS": "--coverage -g -O0 -Wno-error=coverage-invalid-line-number",
+                "CMAKE_CXX_FLAGS": "--coverage -g -O0 -Wno-error=coverage-invalid-line-number",
+                "CMAKE_EXE_LINKER_FLAGS": "--coverage"
+            }
         }
     ],
     "buildPresets": [
@@ -47,6 +80,42 @@
                 "install:Release",
                 "install:Debug"
             ]
+        },
+        {
+            "name": "native-gcc-doc",
+            "displayName": "Documentation",
+            "description": "Generate documentation into the install tree (requires Doxygen and <PKG>_DOC=1)",
+            "configurePreset": "native-gcc",
+            "targets": [
+                "logger_doc:Release"
+            ]
+        },
+        {
+            "name": "native-gcc-asan-all-debug",
+            "displayName": "all [Debug]",
+            "configurePreset": "native-gcc-asan",
+            "configuration": "Debug"
+        },
+        {
+            "name": "native-gcc-tsan-all-debug",
+            "displayName": "all [Debug]",
+            "configurePreset": "native-gcc-tsan",
+            "configuration": "Debug"
+        },
+        {
+            "name": "native-gcc-coverage-all-debug",
+            "displayName": "all [Debug]",
+            "configurePreset": "native-gcc-coverage",
+            "configuration": "Debug"
+        },
+        {
+            "name": "native-gcc-coverage-report",
+            "displayName": "Coverage report [Debug]",
+            "configurePreset": "native-gcc-coverage",
+            "configuration": "Debug",
+            "targets": [
+                "coverage"
+            ]
         }
     ],
     "testPresets": [
@@ -55,6 +124,45 @@
             "displayName": "Run Tests [Debug]",
             "description": "Run all tests in Debug configuration",
             "configurePreset": "native-gcc",
+            "configuration": "Debug",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        },
+        {
+            "name": "native-gcc-asan",
+            "displayName": "Run Tests [Debug, ASan+UBSan]",
+            "configurePreset": "native-gcc-asan",
+            "configuration": "Debug",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        },
+        {
+            "name": "native-gcc-tsan",
+            "displayName": "Run Tests [Debug, TSan]",
+            "configurePreset": "native-gcc-tsan",
+            "configuration": "Debug",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        },
+        {
+            "name": "native-gcc-coverage",
+            "displayName": "Run Tests [Debug, gcov]",
+            "configurePreset": "native-gcc-coverage",
             "configuration": "Debug",
             "output": {
                 "outputOnFailure": true
@@ -86,6 +194,67 @@
                 {
                     "type": "build",
                     "name": "native-gcc-install"
+                }
+            ]
+        },
+        {
+            "name": "native-gcc-asan",
+            "displayName": "[Sanitize] Native GCC (ASan+UBSan)",
+            "description": "Configure, build [Debug], test",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "native-gcc-asan"
+                },
+                {
+                    "type": "build",
+                    "name": "native-gcc-asan-all-debug"
+                },
+                {
+                    "type": "test",
+                    "name": "native-gcc-asan"
+                }
+            ]
+        },
+        {
+            "name": "native-gcc-tsan",
+            "displayName": "[Sanitize] Native GCC (TSan)",
+            "description": "Configure, build [Debug], test",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "native-gcc-tsan"
+                },
+                {
+                    "type": "build",
+                    "name": "native-gcc-tsan-all-debug"
+                },
+                {
+                    "type": "test",
+                    "name": "native-gcc-tsan"
+                }
+            ]
+        },
+        {
+            "name": "native-gcc-coverage",
+            "displayName": "[Coverage] Native GCC (gcov)",
+            "description": "Configure, build [Debug], test, generate gcov coverage report",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "native-gcc-coverage"
+                },
+                {
+                    "type": "build",
+                    "name": "native-gcc-coverage-all-debug"
+                },
+                {
+                    "type": "test",
+                    "name": "native-gcc-coverage"
+                },
+                {
+                    "type": "build",
+                    "name": "native-gcc-coverage-report"
                 }
             ]
         }

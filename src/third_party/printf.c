@@ -35,6 +35,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+// GCC's constant-propagation across the inlined _ntoa_format/_ftoa call sites loses track of the
+// "len < BUFFER_SIZE" guards that already precede every buf[len++] write, and reports a false
+// stringop-overflow. All writes below are bounds-checked; suppress the false positive locally.
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
+
 // 'ntoa' conversion buffer size, this must be big enough to hold one converted
 // numeric number including padded zeros (dynamically created on stack)
 // default: 32 byte
@@ -906,3 +914,7 @@ int vfctprintf(void (*out)(char character, void *arg), void *arg, char const *fo
   out_fct_wrap_type const out_fct_wrap = {out, arg};
   return _vsnprintf(_out_fct, (char *)(uintptr_t)&out_fct_wrap, (size_t)-1, format, va);
 }
+
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif

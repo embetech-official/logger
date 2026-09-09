@@ -40,6 +40,7 @@ set(LOGGER_UTILS ${CMAKE_CURRENT_SOURCE_DIR}/cmake/logger_utils.cmake CACHE FILE
 include(${LOGGER_UTILS})
 
 include(cmake/requirements.cmake)
+include(cmake/coverage.cmake)
 
 add_subdirectory(src)
 

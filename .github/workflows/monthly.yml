@@ -1,0 +1,27 @@
+name: Monthly
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 10 1 * *' # 🕙 Run at 10:15 on the 1st of every month
+
+permissions:
+  contents: read
+
+jobs:
+  run_test_suite:
+    name: 🧪 Run test suite
+    uses: ./.github/workflows/run_test_suite.yml
+    secrets: inherit
+
+  reuse_compliance:
+    name: 📜 REUSE compliance
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: 📜 REUSE compliance
+        uses: ./.github/actions/reuse-compliance

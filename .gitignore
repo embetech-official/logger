@@ -1,5 +1,6 @@
 .vscode
 .cache
+.cpm-cache
 build
 install
 CMakeUserPresets.json

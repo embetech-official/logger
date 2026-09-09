@@ -5,15 +5,16 @@
 #
 # PROJECT_LICENSE/PROJECT_COPYRIGHT/PROJECT_VERSION are scoped to this function so configure_file
 # sees them without overwriting the caller's own PROJECT_VERSION (set by project() at the top level).
-function(logger_configure_license_header source destination)
+function (logger_configure_license_header source destination)
   file(STRINGS ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../VERSION.txt PROJECT_VERSION)
   set(PROJECT_LICENSE "MIT License")
   set(PROJECT_COPYRIGHT "Jan Macheta")
   configure_file(${source} ${destination})
-endfunction()
+endfunction ()
 
-if (CMAKE_SCRIPT_MODE_FILE)
-  # Running as the install(SCRIPT): rewrite the headers already copied into the install tree.
+if (CMAKE_SCRIPT_MODE_FILE STREQUAL CMAKE_CURRENT_LIST_FILE)
+  # Running as the install(SCRIPT) itself (not merely included by another -P script):
+  # rewrite the headers already copied into the install tree.
   set(INSTALL_DIR $ENV{DESTDIR}${CMAKE_INSTALL_PREFIX})
   file(GLOB_RECURSE HEADERS_TO_CONFIGURE "${INSTALL_DIR}/*.h")
   foreach (header ${HEADERS_TO_CONFIGURE})

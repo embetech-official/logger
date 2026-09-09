@@ -12,13 +12,13 @@ TEST(LOGGER, UT05_CodeLocation) {
     received.clear();
   };
 
-  ::LOGGER_SetOutput([](char c, void *context) { *reinterpret_cast<decltype(received) *>(context) << c; }, &received);
+  ::LOGGER_SetOutput([](char c, void *context) { *static_cast<decltype(received) *>(context) << c; }, &received);
   EXPECT_TRUE(::LOGGER_Enable());
   EXPECT_TRUE(::LOGGER_IsEnabled());
 
   char const *const msg = "test message";
   {
-    char const *const expected = "DEFAULT (N) [OVERRIDEN:1]: test message\n";
+    char const *const expected = "DEFAULT (N) [OVERRIDDEN:1]: test message\n";
 
 #line 1
     LOGGER_NOTICE(msg);

@@ -63,10 +63,7 @@ function (logger_set_max_level target)
 
   # Level used for build configurations not covered by CONFIG. Cache variable so
   # projects can override the fallback globally without changing every call site.
-  set(LOGGER_DEFAULT_MAX_LEVEL
-      "DISABLED"
-      CACHE STRING "Log level used for build configurations missing from a logger_set_max_level() CONFIG list"
-  )
+  set(LOGGER_DEFAULT_MAX_LEVEL "DISABLED" CACHE STRING "Log level used for build configurations missing from a logger_set_max_level() CONFIG list")
   set_property(CACHE LOGGER_DEFAULT_MAX_LEVEL PROPERTY STRINGS ${allowed_levels})
 
   string(TOUPPER "${LOGGER_DEFAULT_MAX_LEVEL}" default_max_level)
@@ -154,9 +151,7 @@ function (logger_set_max_level target)
     endforeach ()
   else ()
     string(TOUPPER "${single_build_type}" single_build_type_upper)
-    list(APPEND compile_definitions
-         "${channel}_LOG_CHANNEL_LEVEL=$<TARGET_PROPERTY:${target},${channel}_LOG_LEVEL_${single_build_type_upper}>"
-    )
+    list(APPEND compile_definitions "${channel}_LOG_CHANNEL_LEVEL=$<TARGET_PROPERTY:${target},${channel}_LOG_LEVEL_${single_build_type_upper}>")
   endif ()
 
   message(DEBUG "compile_definitions for target ${target}: ${compile_definitions}")

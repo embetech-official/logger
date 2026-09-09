@@ -1,18 +1,15 @@
-name: CI
+name: Run Test Suite
 
 on:
-  push:
   workflow_dispatch:
   workflow_call:
-  schedule:
-    - cron: '15 10 * * 1' # 🕙 Run at 10:15 every Monday
 
 permissions:
   contents: read
 
 jobs:
-  build_and_test:
-    name: 🔨 Build & Test (native GCC)
+  test:
+    name: 🧪 Run test suite
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
@@ -20,19 +17,16 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: 📚 Install Doxygen
-        uses: ssciwr/doxygen-install@329d88f5a303066a5bd006db7516b1925b86350e # v2.0.1
-
       - name: 🛠️ Install CMake
         uses: lukka/get-cmake@591817e96fcad43505fb4eae36172462abb3a42e # v4.3.3
 
       - name: 🔧 Setup GCC toolchain
-        uses: jmacheta/setup-gcc-toolchain@6c712f09af5efb677bc53e4dea195c60b66286e4 # v2.0.1
+        uses: jmacheta/setup-gcc-toolchain@7aad7bd3b57f5a236de0ea43b232d19f644fb5c4 # v2.1.1
         with:
           toolchain: x86_64-gcc
           version: latest
 
-      - name: 🚀 Run CMake workflow
+      - name: 🧪 Build & test (ASan+UBSan)
         uses: lukka/run-cmake@5d55ea7949e25f69f0ecb516d8d572297e03a956 # v10.9
         with:
-          workflowPreset: 'native-gcc'
+          workflowPreset: 'native-gcc-asan'

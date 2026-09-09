@@ -1,0 +1,209 @@
+enabled: true
+readonly: true
+language: en
+caseSensitive: false
+
+useGitignore: false # ensures better compatibility when used in multiple projects
+
+enabledFileTypes:
+ - cpp
+ - c
+ - markdown
+ - cmake
+ - json
+ - yaml
+ - python
+
+dictionaries:
+ - lorem-ipsum # test payloads use lorem ipsum filler text
+
+files: /**
+ignorePaths:
+ - .clangd
+ - .clang-format
+ - .cmake-format
+ - .cspell.yaml
+ - doc/CMakeLists.txt
+ - build/**
+ - install/**
+ - cmake/CPM.cmake
+ - LICENSE.txt
+ - LICENSES/**
+ - REUSE.toml
+ - '**/Doxyfile'
+ - '**/third_party/**'
+ - '**/.cpm-cache/**'
+
+ignoreRegExpList:
+ - /-W(no)*[a-z]+/g # ignore compiler warning flags
+ - /-D[A-Z]+/g # ignore compiler define flags
+
+words:
+- aarch
+- allmemberslink
+- altera
+- ARGN
+- armhf
+- armv
+- asan
+- authorsection
+- backoffed
+- behaviour
+- bindir
+- BINUTILS
+- briefdescription
+- bugprone
+- classindex
+- classlist
+- classmembers
+- Codacy
+- collaborationgraph
+- constantgroups
+- CPMGetPackageVersion
+- CPPCHECK
+- cppcheck
+- cppcoreguidelines
+- ctest
+- CXXFLAGS
+- Czarnowiejska
+- Deinit
+- deinitialized
+- Deinitializes
+- DESTDIR
+- desynchronized
+- detaileddescription
+- diffable
+- directorygraph
+- Doxyfile
+- doxygenlayout
+- dumpmachine
+- eabi
+- eabihf
+- EEPROM
+- embe
+- embecom
+- embenet
+- embepack
+- embetech
+- embetile
+- embeutils
+- endforeach
+- endfunction
+- ENDL
+- endmacro
+- enms
+- enumvalues
+- etoa
+- ETSI
+- etsi
+- exitcode
+- fctprintf
+- filelist
+- fsanitize
+- fstack
+- ftoa
+- gcov
+- gcovr
+- GNUC
+- gnueabihf
+- groupgraph
+- HARDFP
+- hicpp
+- includedbygraph
+- includegraph
+- inheritancegraph
+- inlineclasses
+- inspectable
+- Jasperse
+- jmacheta
+- JTAG
+- kokke
+- libc
+- libembenet
+- Macheta
+- mainpage
+- Martijn
+- memberdecl
+- memberdef
+- membergroups
+- mfloat
+- mfpu
+- MGMT
+- mgmt
+- microcontroller
+- microcontrollers
+- MODBUS
+- MSDU
+- msdu
+- MSVC
+- msvc
+- MULTIARCH
+- multiarch
+- nameplate
+- namespacelist
+- namespacemembers
+- navindex
+- nestedclasses
+- nestednamespaces
+- NOLINT
+- NOLINTNEXTLINE
+- NVIC
+- packageattributes
+- packagemethods
+- packagestaticattributes
+- packagestaticmethods
+- packagetypes
+- pagedocs
+- PALAN
+- Paland
+- PCKT
+- pckt
+- pointee
+- privateattributes
+- privatemethods
+- privateslots
+- privatestaticattributes
+- privatestaticmethods
+- privatetypes
+- protectedattributes
+- protectedmethods
+- protectedslots
+- protectedstaticattributes
+- protectedstaticmethods
+- protectedtypes
+- PSDU
+- psdu
+- pthread
+- PTRDIFF
+- publicattributes
+- publicmethods
+- publicslots
+- publicstaticattributes
+- publicstaticmethods
+- publictypes
+- putchar
+- qualifiable
+- retval
+- roboot
+- rodata
+- RSSI
+- rssi
+- scpi
+- sigfig
+- softprops
+- sourcelink
+- STREQ
+- STREQUAL
+- superframe
+- suppr
+- tableofcontents
+- tagfile
+- TAGFILES
+- thumbv
+- TOUPPER
+- tsan
+- TSCH
+- UART
+- usedfiles
+- valist
+- vfctprintf

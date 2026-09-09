@@ -16,8 +16,11 @@ TEST(LOGGER, UT06_ThreadSafety) {
     received.clear();
   };
 
-  auto lock_function = [](void *context) { return reinterpret_cast<decltype(mutex) *>(context)->try_lock_for(std::chrono::seconds(5)); };
-  auto unlock_function = [](void *context) { return reinterpret_cast<decltype(mutex) *>(context)->unlock(); };
+  auto lock_function = [](void *context) { return static_cast<decltype(mutex) *>(context)->try_lock_for(std::chrono::seconds(5)); };
+  auto unlock_function = [](void *context) {
+    static_cast<decltype(mutex) *>(context)->unlock();
+    return;
+  };
 
   constexpr static auto msg =
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim "
@@ -41,7 +44,7 @@ TEST(LOGGER, UT06_ThreadSafety) {
     expected << expected_line;
   }
 
-  ::LOGGER_SetOutput([](char c, void *context) { *reinterpret_cast<decltype(received) *>(context) << c; }, &received);
+  ::LOGGER_SetOutput([](char c, void *context) { *static_cast<decltype(received) *>(context) << c; }, &received);
   ::LOGGER_DisableHeader();
 
   EXPECT_FALSE(::LOGGER_SetLockingMechanism(lock_function, nullptr, nullptr));

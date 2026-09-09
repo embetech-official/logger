@@ -10,7 +10,7 @@ TEST(LOGGER, UT02_RawTimestamp) {
     received.clear();
   };
 
-  ::LOGGER_SetOutput([](char c, void *context) { *reinterpret_cast<decltype(received) *>(context) << c; }, &received);
+  ::LOGGER_SetOutput([](char c, void *context) { *static_cast<decltype(received) *>(context) << c; }, &received);
   EXPECT_TRUE(::LOGGER_Enable());
   EXPECT_TRUE(::LOGGER_IsEnabled());
 

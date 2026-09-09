@@ -6,6 +6,7 @@
 @copyright $Copyright$
 @brief     Logging component
 */
+// NOLINTNEXTLINE(readability-identifier-naming) LOGGER_MAIN_ is the documented guard logger.h looks for
 #define LOGGER_MAIN_
 #include "printf.h"
 
@@ -14,333 +15,294 @@
 #include <inttypes.h>
 #include <stdarg.h>
 
-
 /// LOGGER runtime descriptor
 typedef struct {
-    bool                  isEnabled;      ///< Determines if the channel is active (1) or not (0)
-    bool                  headerDisabled; ///< Determines whether log message header should not be printed
-    LOGGER_OutputFunction out;            ///< Channel's output function
-    void*                 outContext;     ///< Output function's context
+  bool isEnabled;            ///< Determines if the channel is active (1) or not (0)
+  bool headerDisabled;       ///< Determines whether log message header should not be printed
+  LOGGER_OutputFunction out; ///< Channel's output function
+  void *outContext;          ///< Output function's context
 
 #if 1 == LOGGER_THREAD_SAFETY_HOOKS
-    LOGGER_LockFunction   lock;              ///< Channel's lock function
-    LOGGER_UnlockFunction unlock;            ///< Channel's unlock function
-    void*                 lockUnlockContext; ///< Lock/Unlock functions' context
+  LOGGER_LockFunction lock;     ///< Channel's lock function
+  LOGGER_UnlockFunction unlock; ///< Channel's unlock function
+  void *lockUnlockContext;      ///< Lock/Unlock functions' context
 #endif
 
 #if 1 == LOGGER_TIMESTAMPS
-    LOGGER_TimeSourceFunction getTime; ///< Channel's time source function
+  LOGGER_TimeSourceFunction getTime; ///< Channel's time source function
 #endif
 #if 1 == LOGGER_RUNTIME_VERBOSITY
-    LOGGER_level level; ///< Runtime parameter to determine whether the message should be printed
+  LOGGER_level level; ///< Runtime parameter to determine whether the message should be printed
 #endif
 #if 1 == LOGGER_CUSTOM_AFFIXES
 
-    char const* prefix;       ///< Pointer to message prefix (MAY NOT be a c-string)
-    size_t      prefixLength; ///< Prefix length
+  char const *prefix;  ///< Pointer to message prefix (MAY NOT be a c-string)
+  size_t prefixLength; ///< Prefix length
 
-    char const* suffix;       ///< Pointer to message suffix (MAY NOT be a c-string)
-    size_t      suffixLength; ///< Suffix length
+  char const *suffix;  ///< Pointer to message suffix (MAY NOT be a c-string)
+  size_t suffixLength; ///< Suffix length
 #endif
 
 #if 1 == LOGGER_FLUSH_HOOKS
-    LOGGER_FlushFunction flushHook;
-    bool                 flushOnNewLine;
+  LOGGER_FlushFunction flushHook;
+  bool flushOnNewLine;
 #endif
 } LOGGER_Descriptor;
 
-
+// NOLINTBEGIN(clang-diagnostic-missing-field-initializers) the remaining fields are zero-initialised by design
 static LOGGER_Descriptor LOGGER_RuntimeDescriptor = {
 #if 1 == LOGGER_RUNTIME_VERBOSITY
     .level = LOGGER_LEVEL_TRACE
 #else
-    0 // Supress empty initialization list warning
+    false // Supress empty initialization list warning
 #endif
 };
+// NOLINTEND(clang-diagnostic-missing-field-initializers)
 static char const LOGGER_printableLevel[] = {'M', 'A', 'C', 'E', 'W', 'N', 'I', 'V', 'D', 'T'};
 
-
 #if 1 == LOGGER_CUSTOM_AFFIXES
-void LOGGER_SetPrefix(char const* data, size_t length) {
-    LOGGER_RuntimeDescriptor.prefix       = data;
-    LOGGER_RuntimeDescriptor.prefixLength = length;
+void LOGGER_SetPrefix(char const *data, size_t length) {
+  LOGGER_RuntimeDescriptor.prefix = data;
+  LOGGER_RuntimeDescriptor.prefixLength = length;
 }
 
-
-void LOGGER_SetSuffix(char const* data, size_t length) {
-    LOGGER_RuntimeDescriptor.suffix       = data;
-    LOGGER_RuntimeDescriptor.suffixLength = length;
+void LOGGER_SetSuffix(char const *data, size_t length) {
+  LOGGER_RuntimeDescriptor.suffix = data;
+  LOGGER_RuntimeDescriptor.suffixLength = length;
 }
-
 
 static void LOGGER_PrintPrefix(void) {
-    if (LOGGER_RuntimeDescriptor.prefix != NULL) {
-        for (size_t i = 0; i != LOGGER_RuntimeDescriptor.prefixLength; ++i) {
-            LOGGER_RuntimeDescriptor.out(LOGGER_RuntimeDescriptor.prefix[i], LOGGER_RuntimeDescriptor.outContext);
-        }
+  if(LOGGER_RuntimeDescriptor.prefix != NULL) {
+    for(size_t i = 0; i != LOGGER_RuntimeDescriptor.prefixLength; ++i) {
+      LOGGER_RuntimeDescriptor.out(LOGGER_RuntimeDescriptor.prefix[i], LOGGER_RuntimeDescriptor.outContext);
     }
+  }
 }
 
-
 static void LOGGER_PrintSuffix(void) {
-    if (LOGGER_RuntimeDescriptor.suffix != NULL) {
-        for (size_t i = 0; i != LOGGER_RuntimeDescriptor.suffixLength; ++i) {
-            LOGGER_RuntimeDescriptor.out(LOGGER_RuntimeDescriptor.suffix[i], LOGGER_RuntimeDescriptor.outContext);
-        }
+  if(LOGGER_RuntimeDescriptor.suffix != NULL) {
+    for(size_t i = 0; i != LOGGER_RuntimeDescriptor.suffixLength; ++i) {
+      LOGGER_RuntimeDescriptor.out(LOGGER_RuntimeDescriptor.suffix[i], LOGGER_RuntimeDescriptor.outContext);
     }
+  }
 }
 #else
 
-void LOGGER_SetPrefix(char const* data, size_t length) {
-    (void)data, (void)length; // Mark as unused
+void LOGGER_SetPrefix(char const *data, size_t length) {
+  (void)data, (void)length; // Mark as unused
 }
 
-
-void LOGGER_SetSuffix(char const* data, size_t length) {
-    (void)data, (void)length; // Mark as unused
+void LOGGER_SetSuffix(char const *data, size_t length) {
+  (void)data, (void)length; // Mark as unused
 }
 
+static inline void LOGGER_PrintPrefix(void) {}
 
-static inline void LOGGER_PrintPrefix(void) {
-}
-
-
-static inline void LOGGER_PrintSuffix(void) {
-}
+static inline void LOGGER_PrintSuffix(void) {}
 #endif
-
 
 #if 1 == LOGGER_THREAD_SAFETY_HOOKS
 bool LOGGER_Lock(void) {
-    // Return result if lock was successful or true, if lock function is not set
-    return (LOGGER_RuntimeDescriptor.lock != NULL) ? LOGGER_RuntimeDescriptor.lock(LOGGER_RuntimeDescriptor.lockUnlockContext) : true;
+  // Return result if lock was successful or true, if lock function is not set
+  return (LOGGER_RuntimeDescriptor.lock != NULL) ? LOGGER_RuntimeDescriptor.lock(LOGGER_RuntimeDescriptor.lockUnlockContext) : true;
 }
-
 
 void LOGGER_Unlock(void) {
-    // Do not perform sanity checks - this is "internal function" that MUST be invoked in conjunction with LOGGER_Lock (which does sanity checks). By design it will not be invoked, if sanity check fails
-    if (LOGGER_RuntimeDescriptor.unlock != NULL) {
-        LOGGER_RuntimeDescriptor.unlock(LOGGER_RuntimeDescriptor.lockUnlockContext);
-    }
+  // Do not perform sanity checks - this is "internal function" that MUST be invoked in conjunction with LOGGER_Lock (which does sanity checks). By
+  // design it will not be invoked, if sanity check fails
+  if(LOGGER_RuntimeDescriptor.unlock != NULL) {
+    LOGGER_RuntimeDescriptor.unlock(LOGGER_RuntimeDescriptor.lockUnlockContext);
+  }
 }
 
-
-bool LOGGER_SetLockingMechanism(LOGGER_LockFunction lock, LOGGER_UnlockFunction unlock, void* fContext) {
-    if ((unlock != NULL) != (lock != NULL))
-        return false; // Both function have to be either set or cleared
-    // Attempt to lock LOGGER. In rare examples, when trying to change locking mechanism during program operation it will allow to finish printing with old locking mechanism and then change lock
-    if (LOGGER_Lock()) {
-        LOGGER_UnlockFunction oldUnlock             = LOGGER_RuntimeDescriptor.unlock;
-        void*                 oldUnlockContext      = LOGGER_RuntimeDescriptor.lockUnlockContext;
-        LOGGER_RuntimeDescriptor.lock              = lock;
-        LOGGER_RuntimeDescriptor.unlock            = unlock;
-        LOGGER_RuntimeDescriptor.lockUnlockContext = fContext;
-        if (oldUnlock)
-            oldUnlock(oldUnlockContext); // log was locked using old lock, so unlock with old lock
-        return true;
+bool LOGGER_SetLockingMechanism(LOGGER_LockFunction lock, LOGGER_UnlockFunction unlock, void *fContext) {
+  if((unlock != NULL) != (lock != NULL)) {
+    return false; // Both function have to be either set or cleared
+  }
+  // Attempt to lock LOGGER. In rare examples, when trying to change locking mechanism during program operation it will allow to finish printing with
+  // old locking mechanism and then change lock
+  if(LOGGER_Lock()) {
+    LOGGER_UnlockFunction oldUnlock = LOGGER_RuntimeDescriptor.unlock;
+    void *oldUnlockContext = LOGGER_RuntimeDescriptor.lockUnlockContext;
+    LOGGER_RuntimeDescriptor.lock = lock;
+    LOGGER_RuntimeDescriptor.unlock = unlock;
+    LOGGER_RuntimeDescriptor.lockUnlockContext = fContext;
+    if(oldUnlock) {
+      oldUnlock(oldUnlockContext); // log was locked using old lock, so unlock with old lock
     }
-    return false;
+    return true;
+  }
+  return false;
 }
 #else
 
-
-bool LOGGER_SetLockingMechanism(LOGGER_LockFunction lock, LOGGER_UnlockFunction unlock, void* fContext) {
-    (void)lock, (void)unlock, (void)fContext; // Mark as unused
-    return true;
+bool LOGGER_SetLockingMechanism(LOGGER_LockFunction lock, LOGGER_UnlockFunction unlock, void *fContext) {
+  (void)lock, (void)unlock, (void)fContext; // Mark as unused
+  return true;
 }
 #endif
-
 
 #if 1 == LOGGER_FLUSH_HOOKS
 void LOGGER_SetFlushHook(LOGGER_FlushFunction hook, bool flushOnNewLine) {
-    LOGGER_RuntimeDescriptor.flushHook      = hook;
-    LOGGER_RuntimeDescriptor.flushOnNewLine = flushOnNewLine;
+  LOGGER_RuntimeDescriptor.flushHook = hook;
+  LOGGER_RuntimeDescriptor.flushOnNewLine = flushOnNewLine;
 }
-
 
 void LOGGER_Flush(void) {
-    if (LOGGER_RuntimeDescriptor.flushHook != NULL) {
-        LOGGER_RuntimeDescriptor.flushHook();
-    }
+  if(LOGGER_RuntimeDescriptor.flushHook != NULL) {
+    LOGGER_RuntimeDescriptor.flushHook();
+  }
 }
-
 
 void LOGGER_PrintNL(void) {
-    // Do not perform sanity checks or lock - this is "internal function" that MUST be invoked in conjunction with LOGGER_Lock (which does sanity checks). By design it will not be invoked, if sanity
-    // check fails
-    LOGGER_RuntimeDescriptor.out('\n', LOGGER_RuntimeDescriptor.outContext);
-    if (LOGGER_RuntimeDescriptor.flushOnNewLine) {
-        LOGGER_Flush();
-    }
+  // Do not perform sanity checks or lock - this is "internal function" that MUST be invoked in conjunction with LOGGER_Lock (which does sanity
+  // checks). By design it will not be invoked, if sanity check fails
+  LOGGER_RuntimeDescriptor.out('\n', LOGGER_RuntimeDescriptor.outContext);
+  if(LOGGER_RuntimeDescriptor.flushOnNewLine) {
+    LOGGER_Flush();
+  }
 }
 #else
-
 
 void LOGGER_SetFlushHook(LOGGER_FlushFunction hook, bool flushOnNewLine) {
-    (void)hook, (void)flushOnNewLine; // Mark as unused
+  (void)hook, (void)flushOnNewLine; // Mark as unused
 }
-
 
 void LOGGER_PrintNL(void) {
-    // Do not perform sanity checks or lock - this is "internal function" that MUST be invoked in conjunction with LOGGER_Lock (which does sanity checks). By design it will not be invoked, if sanity
-    // check fails
-    LOGGER_RuntimeDescriptor.out('\n', LOGGER_RuntimeDescriptor.outContext);
+  // Do not perform sanity checks or lock - this is "internal function" that MUST be invoked in conjunction with LOGGER_Lock (which does sanity
+  // checks). By design it will not be invoked, if sanity check fails
+  LOGGER_RuntimeDescriptor.out('\n', LOGGER_RuntimeDescriptor.outContext);
 }
 #endif
-
 
 #if 1 == LOGGER_RUNTIME_VERBOSITY
-LOGGER_level LOGGER_DoGetRuntimeLevel(void) {
-    return LOGGER_RuntimeDescriptor.level;
-}
-
+LOGGER_level LOGGER_DoGetRuntimeLevel(void) { return LOGGER_RuntimeDescriptor.level; }
 
 void LOGGER_SetRuntimeLevel(LOGGER_level level) {
-    if (level < LOGGER_LEVEL_DISABLED) {
-        level = LOGGER_LEVEL_DISABLED;
-    }
-    if (level > LOGGER_LEVEL_TRACE) {
-        level = LOGGER_LEVEL_TRACE;
-    }
+  if(level < LOGGER_LEVEL_DISABLED) {
+    level = LOGGER_LEVEL_DISABLED;
+  }
+  if(level > LOGGER_LEVEL_TRACE) {
+    level = LOGGER_LEVEL_TRACE;
+  }
 
-    LOGGER_RuntimeDescriptor.level = level;
+  LOGGER_RuntimeDescriptor.level = level;
 }
 #else
 
-
 void LOGGER_SetRuntimeLevel(LOGGER_level level) {
-    (void)level; // Mark as unused
+  (void)level; // Mark as unused
 }
 #endif
 
-
-void LOGGER_PrintLine(LOGGER_HeaderDescriptor descr, char const* format, ...) {
-    if (LOGGER_IsEnabled() && LOGGER_Lock()) {
-        LOGGER_PrintPrefix();
-        LOGGER_PrintHeader(descr);
-        va_list args; // the scope of this variable is larger than necessary due to MSVC++2008 limitations
-        va_start(args, format);
-        vfctprintf(LOGGER_RuntimeDescriptor.out, LOGGER_RuntimeDescriptor.outContext, format, args);
-        va_end(args);
-        LOGGER_PrintNL();
-        LOGGER_PrintSuffix();
-        LOGGER_Unlock();
-    }
-}
-
-
-void LOGGER_Print(char const* format, ...) {
-    va_list args;
-    // Do not perform sanity checks or lock - this is "internal function" that MUST be invoked in conjunction with LOGGER_Lock (which does sanity checks). By design it will not be invoked, if sanity
-    // check fails Write the very log message
+void LOGGER_PrintLine(LOGGER_HeaderDescriptor descr, char const *format, ...) {
+  if(LOGGER_IsEnabled() && LOGGER_Lock()) {
+    LOGGER_PrintPrefix();
+    LOGGER_PrintHeader(descr);
+    va_list args; // the scope of this variable is larger than necessary due to MSVC++2008 limitations
     va_start(args, format);
     vfctprintf(LOGGER_RuntimeDescriptor.out, LOGGER_RuntimeDescriptor.outContext, format, args);
+    // NOLINTNEXTLINE(clang-analyzer-valist.Uninitialized) va_start above is unconditional in this scope
     va_end(args);
-}
-
-
-bool LOGGER_StartSection(void) {
-    if (LOGGER_IsEnabled() && LOGGER_Lock()) {
-        LOGGER_PrintPrefix();
-        return true;
-    }
-    return false;
-}
-
-
-void LOGGER_EndSection(void) {
+    LOGGER_PrintNL();
     LOGGER_PrintSuffix();
     LOGGER_Unlock();
+  }
 }
 
+void LOGGER_Print(char const *format, ...) {
+  va_list args;
+  // Do not perform sanity checks or lock - this is "internal function" that MUST be invoked in conjunction with LOGGER_Lock (which does sanity
+  // checks). By design it will not be invoked, if sanity check fails Write the very log message
+  va_start(args, format);
+  vfctprintf(LOGGER_RuntimeDescriptor.out, LOGGER_RuntimeDescriptor.outContext, format, args);
+  va_end(args);
+}
+
+bool LOGGER_StartSection(void) {
+  if(LOGGER_IsEnabled() && LOGGER_Lock()) {
+    LOGGER_PrintPrefix();
+    return true;
+  }
+  return false;
+}
+
+void LOGGER_EndSection(void) {
+  LOGGER_PrintSuffix();
+  LOGGER_Unlock();
+}
 
 void LOGGER_PrintHeader(LOGGER_HeaderDescriptor descr) {
-    // Do not perform sanity checks - this is "internal function" that MUST be invoked in conjunction with LOGGER_Lock (which does sanity checks). By design it will not be invoked, if sanity check fails
-    if (false == LOGGER_RuntimeDescriptor.headerDisabled) {
+  // Do not perform sanity checks - this is "internal function" that MUST be invoked in conjunction with LOGGER_Lock (which does sanity checks). By
+  // design it will not be invoked, if sanity check fails
+  if(!LOGGER_RuntimeDescriptor.headerDisabled) {
 #if 1 == LOGGER_TIMESTAMPS
-        uint32_t now = 0;
-        if (LOGGER_RuntimeDescriptor.getTime != NULL) {
-            now = LOGGER_RuntimeDescriptor.getTime();
-        }
+    uint32_t now = 0;
+    if(LOGGER_RuntimeDescriptor.getTime != NULL) {
+      now = LOGGER_RuntimeDescriptor.getTime();
+    }
 
-#    if 1 == LOGGER_HUMAN_READABLE_TIMESTAMP
-        uint32_t ms = now % UINT32_C(1000);
-        now /= UINT32_C(1000);
-        uint32_t seconds = now % UINT32_C(60);
-        now /= UINT32_C(60);
-        uint32_t minutes = now % UINT32_C(60);
-        uint32_t hours   = now / UINT32_C(60);
-#        define LOGGER_TIME_FORMAT_STR "%.02u:%.02u:%.02u.%.03u "
-#        define LOGGER_TIME_ARGS       , hours, minutes, seconds, ms
-#    else
-#        define LOGGER_TIME_FORMAT_STR "%" PRIu32 " "
-#        define LOGGER_TIME_ARGS       , now
-#    endif
+#if 1 == LOGGER_HUMAN_READABLE_TIMESTAMP
+    uint32_t milliseconds = now % UINT32_C(1000);
+    now /= UINT32_C(1000);
+    uint32_t seconds = now % UINT32_C(60);
+    now /= UINT32_C(60);
+    uint32_t minutes = now % UINT32_C(60);
+    uint32_t hours = now / UINT32_C(60);
+#define LOGGER_TIME_FORMAT_STR "%.02u:%.02u:%.02u.%.03u "
+#define LOGGER_TIME_ARGS , hours, minutes, seconds, milliseconds
 #else
-#    define LOGGER_TIME_FORMAT_STR ""
-#    define LOGGER_TIME_ARGS
+#define LOGGER_TIME_FORMAT_STR "%" PRIu32 " "
+#define LOGGER_TIME_ARGS , now
+#endif
+#else
+#define LOGGER_TIME_FORMAT_STR ""
+#define LOGGER_TIME_ARGS
 #endif
 
 #if 1 == LOGGER_HEADER_WITH_LOCATION
-#    define LOGGER_LOCATION_FORMAT_STR " [%s:%d]"
-#    define LOGGER_LOCATION_ARGS       , descr.file, descr.line
+#define LOGGER_LOCATION_FORMAT_STR " [%s:%d]"
+#define LOGGER_LOCATION_ARGS , descr.file, descr.line
 #else
-#    define LOGGER_LOCATION_FORMAT_STR ""
-#    define LOGGER_LOCATION_ARGS
+#define LOGGER_LOCATION_FORMAT_STR ""
+#define LOGGER_LOCATION_ARGS
 #endif
 
-        fctprintf(LOGGER_RuntimeDescriptor.out,
-                  LOGGER_RuntimeDescriptor.outContext,
-                  LOGGER_TIME_FORMAT_STR "%s (%c)" LOGGER_LOCATION_FORMAT_STR ": " LOGGER_TIME_ARGS,
-                  descr.channel,
-                  LOGGER_printableLevel[descr.level] LOGGER_LOCATION_ARGS);
-    }
+    fctprintf(LOGGER_RuntimeDescriptor.out, LOGGER_RuntimeDescriptor.outContext,
+              LOGGER_TIME_FORMAT_STR "%s (%c)" LOGGER_LOCATION_FORMAT_STR ": " LOGGER_TIME_ARGS, descr.channel,
+              LOGGER_printableLevel[descr.level] LOGGER_LOCATION_ARGS);
+  }
 }
 
-
-void LOGGER_SetOutput(LOGGER_OutputFunction f, void* fContext) {
-    if (LOGGER_Lock()) {
-        LOGGER_RuntimeDescriptor.out        = f;
-        LOGGER_RuntimeDescriptor.outContext = fContext;
-        LOGGER_RuntimeDescriptor.isEnabled  = (f != NULL);
-        LOGGER_Unlock();
-    }
+void LOGGER_SetOutput(LOGGER_OutputFunction output, void *output_context) {
+  if(LOGGER_Lock()) {
+    LOGGER_RuntimeDescriptor.out = output;
+    LOGGER_RuntimeDescriptor.outContext = output_context;
+    LOGGER_RuntimeDescriptor.isEnabled = (output != NULL);
+    LOGGER_Unlock();
+  }
 }
 
-
-void LOGGER_SetTimeSource(LOGGER_TimeSourceFunction f) {
+void LOGGER_SetTimeSource(LOGGER_TimeSourceFunction time_source) {
 #if 1 == LOGGER_TIMESTAMPS
-    LOGGER_RuntimeDescriptor.getTime = f;
+  LOGGER_RuntimeDescriptor.getTime = time_source;
 #else
-    (void)f; // Mark as unused
+  (void)time_source; // Mark as unused
 #endif
 }
-
 
 bool LOGGER_Enable(void) {
-    if (LOGGER_RuntimeDescriptor.out != NULL) {
-        LOGGER_RuntimeDescriptor.isEnabled = true;
-        return true;
-    }
-    return false;
+  if(LOGGER_RuntimeDescriptor.out != NULL) {
+    LOGGER_RuntimeDescriptor.isEnabled = true;
+    return true;
+  }
+  return false;
 }
 
+void LOGGER_Disable(void) { LOGGER_RuntimeDescriptor.isEnabled = false; }
 
-void LOGGER_Disable(void) {
-    LOGGER_RuntimeDescriptor.isEnabled = false;
-}
+bool LOGGER_IsEnabled(void) { return LOGGER_RuntimeDescriptor.isEnabled; }
 
+void LOGGER_DisableHeader(void) { LOGGER_RuntimeDescriptor.headerDisabled = true; }
 
-bool LOGGER_IsEnabled(void) {
-    return LOGGER_RuntimeDescriptor.isEnabled;
-}
-
-
-void LOGGER_DisableHeader(void) {
-    LOGGER_RuntimeDescriptor.headerDisabled = true;
-}
-
-
-void LOGGER_EnableHeader(void) {
-    LOGGER_RuntimeDescriptor.headerDisabled = false;
-}
+void LOGGER_EnableHeader(void) { LOGGER_RuntimeDescriptor.headerDisabled = false; }

@@ -1,0 +1,3 @@
+# Normalize to LF in the repository: the shared .clang-format/.cmake-format both emit LF, so a
+# CRLF checkout would make every formatter run rewrite whole files.
+* text=auto eol=lf

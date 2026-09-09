@@ -16,7 +16,7 @@ TEST(LOGGER, UT01_MinimalViableProduct) {
 
   EXPECT_FALSE(::LOGGER_Enable());
   EXPECT_FALSE(::LOGGER_IsEnabled());
-  ::LOGGER_SetOutput([](char c, void *context) { *reinterpret_cast<decltype(received) *>(context) << c; }, &received);
+  ::LOGGER_SetOutput([](char c, void *context) { *static_cast<decltype(received) *>(context) << c; }, &received);
 
   EXPECT_TRUE(::LOGGER_Enable());
   EXPECT_TRUE(::LOGGER_IsEnabled());

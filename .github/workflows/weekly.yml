@@ -1,0 +1,15 @@
+name: Weekly
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 10 * * 1' # 🕙 Run at 10:15 every Monday
+
+permissions:
+  contents: read
+
+jobs:
+  run_test_suite:
+    name: 🧪 Run test suite
+    uses: ./.github/workflows/run_test_suite.yml
+    secrets: inherit
