@@ -24,7 +24,7 @@ permissions:
 jobs:
   sync_version_tags:
     name: 🏷️ Sync version tags
-    runs-on: [self-hosted, linux, x64]
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
       contents: write
