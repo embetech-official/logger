@@ -100,8 +100,8 @@ typedef void (*LOGGER_OutputFunction)(char c, void *context); ///< Log output fu
 
 /**
  * @brief Binds output function to log
- * @param[in] f output function
- * @param[in] fContext output function's context
+ * @param[in] output output function
+ * @param[in] output_context output function's context
  */
 void LOGGER_SetOutput(LOGGER_OutputFunction output, void *output_context);
 
@@ -125,7 +125,7 @@ typedef uint32_t (*LOGGER_TimeSourceFunction)(void); ///< Log time source functi
 
 /**
  * @brief Binds time source to log
- * @param[in] f function that returns current system time when invoked
+ * @param[in] time_source function that returns current system time when invoked
  */
 void LOGGER_SetTimeSource(LOGGER_TimeSourceFunction time_source);
 
