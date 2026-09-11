@@ -38,4 +38,4 @@ install(EXPORT logger-${CMAKE_LIBRARY_ARCHITECTURE}-targets NAMESPACE embetech::
 install(SCRIPT ${CMAKE_CURRENT_LIST_DIR}/install_header_licenses.cmake)
 install(FILES ${PROJECT_SOURCE_DIR}/cmake/logger_utils.cmake DESTINATION ${METADATA_DIR})
 
-install(FILES LICENSE.txt DESTINATION .)
+install(FILES LICENSE.txt VERSION.txt DESTINATION .)

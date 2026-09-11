@@ -12,7 +12,7 @@ function (logger_configure_license_header source destination)
   configure_file(${source} ${destination})
 endfunction ()
 
-if (CMAKE_SCRIPT_MODE_FILE STREQUAL CMAKE_CURRENT_LIST_FILE)
+if (CMAKE_SCRIPT_MODE_FILE)
   # Running as the install(SCRIPT) itself (not merely included by another -P script):
   # rewrite the headers already copied into the install tree.
   set(INSTALL_DIR $ENV{DESTDIR}${CMAKE_INSTALL_PREFIX})
