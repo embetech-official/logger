@@ -1,11 +1,3 @@
-/**
-@file
-@purpose   LOGGER Lightweight logging component
-@version   $Revision$
-@license   $License$
-@copyright $Copyright$
-@brief     Logging component
-*/
 // NOLINTNEXTLINE(readability-identifier-naming) LOGGER_MAIN_ is the documented guard logger.h looks for
 #define LOGGER_MAIN_
 #include "printf.h"

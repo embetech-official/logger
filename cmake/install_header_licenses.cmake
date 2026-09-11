@@ -8,7 +8,7 @@
 function (logger_configure_license_header source destination)
   file(STRINGS ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../VERSION.txt PROJECT_VERSION)
   set(PROJECT_LICENSE "MIT License")
-  set(PROJECT_COPYRIGHT "Jan Macheta")
+  set(PROJECT_COPYRIGHT "Embetech sp. z o.o.")
   configure_file(${source} ${destination})
 endfunction ()
 

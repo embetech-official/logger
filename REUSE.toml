@@ -1,11 +1,11 @@
 version = 1
 SPDX-PackageName = "logger"
-SPDX-PackageSupplier = "Jan Macheta"
+SPDX-PackageSupplier = "Embetech sp. z o.o. <contact@embe.tech>"
 SPDX-PackageDownloadLocation = "https://github.com/embetech-official/logger"
 
 [[annotations]]
 path = "**"
-SPDX-FileCopyrightText = "Jan Macheta"
+SPDX-FileCopyrightText = "Embetech sp. z o.o."
 SPDX-License-Identifier = "MIT"
 
 [[annotations]]
